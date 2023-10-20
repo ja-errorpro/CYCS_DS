@@ -1,0 +1,62 @@
+(+3*4)-5
+Error 3: it is not infix in the parentheses.
+
+(3)*4
+3, 4, *
+
++3*4
+Error 3: there is one extra operator.
+
+(+3*4)
+Error 3: it is not infix in the parentheses.
+
+4*(3+4)
+4, 3, 4, +, *
+
+4*(+3*4)
+Error 3: it is not infix in the parentheses.
+
+(3+4)5
+Error 3: there is one extra operand.
+
+(-3+4)5
+Error 3: it is not infix in the parentheses.
+
+()*4
+Error 3: it is not infix in the parentheses.
+
+(+)*4
+Error 3: it is not infix in the parentheses.
+
+24 * 7770 ^ (55+30*2)
+Error 1: ^ is not a legitimate character.
+
+((24*7770)19)/15
+Error 3: there is one extra operand.
+
+(29+101)*33/25
+29, 101, +, 33, *, 25, /
+
+24 * 7770 / (55+30*2)
+24, 7770, *, 55, 30, 2, *, +, /
+
+(90 + ( 70 * (68-55/10)))
+90, 70, 68, 55, 10, /, -, *, +
+
+4+9(1+2)
+Error 3: there is one extra operand.
+
+4++9(1+2)
+Error 3: there is one extra operator.
+
+4+9(1++2)
+Error 3: there is one extra operand.
+
+(1+2)(3+4)
+Error 3: there is one extra operand.
+
+(empty string)
+Error 3: there is one extra operator.
+
+1+
+Error 3: there is one extra operator.
