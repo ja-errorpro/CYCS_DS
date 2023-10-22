@@ -380,13 +380,10 @@ public:
   @ return: true if it is successful, false otherwise
   */
   bool InfixToPostfix(List<string> &exp, List<string> &ret) {
-    exp.push_front(" ");
     Stack<string> oper;
 
     // List<string> ret;
 
-    string prev;
-    exp.front(prev), exp.delete_front();
     while (!exp.empty()) {
       string cur;
       exp.front(cur), exp.delete_front();
@@ -421,7 +418,6 @@ public:
       } else if (isOperand(cur)) { // operand can be pushed directly
         ret.push_back(cur);
       }
-      prev = cur;
     }
 
     string o;
