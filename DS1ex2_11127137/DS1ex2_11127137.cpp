@@ -300,7 +300,7 @@ public:
     bool ret = isSymbolLegal(s) && isParenthesisLegal(s);
     if (!ret)
       return false;
-    bool inpar = false;
+    int inpar = 0;
     char prev = ' ';
     for (char i : s) {
       if (i == '(') {
@@ -308,13 +308,13 @@ public:
           cout << "Error 3: there is one extra operand.\n";
           return false;
         }
-        inpar = true;
+        inpar++;
       } else if (i == ')') {
         if (prev == '(' || isOperator(prev)) {
           cout << "Error 3: it is not infix in the parentheses.\n";
           return false;
         }
-        inpar = false;
+        inpar--;
       } else if (isOperator(i)) {
         if (isOperator(prev) || prev == ' ' || prev == '(') {
           if (inpar)
