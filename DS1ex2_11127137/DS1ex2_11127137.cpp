@@ -431,56 +431,51 @@ public:
     return true;
   }
   /*
-    bool evaluate(List<string> strList, int &ret) {
-      ret = 0;
-      List<string> tmp = strList;
-      Stack<int> s;
-      while (!tmp.empty()) {
-        string cur;
-        tmp.front(cur), tmp.delete_front();
-        if (isOperator(cur[0])) {
-          int a, b;
-          s.gettop(b), s.pop();
-          s.gettop(a), s.pop();
-          switch (cur[0]) {
-          case '+':
-            if (a > INT_MAX - b) {
-              cout << "Error x: the number is too large.\n";
-              return false;
-            }
-            s.push(a + b);
-            break;
-          case '-':
-            if (a < INT_MIN + b) {
-              cout << "Error x: the number is too large.\n";
-              return false;
-            }
-            s.push(a - b);
-            break;
-          case '*':
-            if (a > INT_MAX / b) {
-              cout << "Error x: the number is too large.\n";
-              return false;
-            }
-            s.push(a * b);
-            break;
-          case '/':
-            if (b == 0) {
-              cout << "Error 4: division by zero.\n";
-              return false;
-            }
-            s.push(a / b);
-            break;
+    Evaluate the postfix expression
+  @ param strList: the postfix expression
+  @ param ret: the result of the expression
+  @ return: true if success, false otherwise
+  */
+  bool evaluate(List<string> strList, int &ret) {
+    ret = 0;
+    List<string> tmp = strList;
+    Stack<int> s;
+    while (!tmp.empty()) {
+      string cur;
+      tmp.front(cur), tmp.delete_front();
+      if (isOperator(cur[0])) {
+        int a, b;
+        s.gettop(b), s.pop();
+        s.gettop(a), s.pop();
+        switch (cur[0]) {
+        case '+':
+
+          s.push(a + b);
+          break;
+        case '-':
+
+          s.push(a - b);
+          break;
+        case '*':
+
+          s.push(a * b);
+          break;
+        case '/':
+          if (b == 0) {
+            cout << "### Error: Divided by ZERO! ###\n";
+            return false;
           }
-        } else {
-          int num = atoi(cur.c_str());
-          s.push(num);
+          s.push(a / b);
+          break;
         }
+      } else {
+        int num = atoi(cur.c_str()); // convert string to int
+        s.push(num);
       }
-      s.gettop(ret);
-      return true;
     }
-    */
+    s.gettop(ret);
+    return true;
+  }
 };
 void WriteMenu() {
   // cout.width(28);
@@ -514,20 +509,22 @@ inline void Solve(int task = 1) {
     cout << "It is a legitimate infix expression.\n";
     // cerr << "\033[1;32mInfix To Postfix Passed\033[0m" << endl;
 
-    // int ans;
-    // if (Sol.evaluate(ret, ans))
-    //   cerr << "\033[1;32mEvaluation: " << ans << "\033[0m" << endl;
     //  cerr << "\033[1;32mEvaluating Passed\033[0m" << endl;
     //  if (task == 2) {
+    List<string> tmp = List<string>(ret);
     cout << "Postfix expression: ";
-    while (!ret.empty()) {
+    while (!tmp.empty()) {
       string s;
-      ret.front(s);
-      cout << s << (ret.size() == 1 ? "" : ", ");
-      ret.delete_front();
+      tmp.front(s);
+      cout << s << (tmp.size() == 1 ? "" : ", ");
+      tmp.delete_front();
     }
     cout << endl;
-    //}
+    int ans;
+    if (Sol.evaluate(ret, ans))
+      cout << "Answer: " << ans << endl;
+    else
+      cout << "### It cannot be successfully evaluated! ###\n";
   }
 }
 signed main() {
