@@ -1,0 +1,15 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  coding-style:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3.3.0
+    - name: coding convention
+      run: |
+            sudo apt-get install -q -y clang-format
+            sh .ci/check-format.sh
+            echo "Coding Style Checking Finished"
+      shell: bash
