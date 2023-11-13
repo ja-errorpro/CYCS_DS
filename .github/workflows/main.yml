@@ -10,6 +10,6 @@ jobs:
     - name: coding convention
       run: |
             sudo apt-get install -q -y clang-format
-            sh .ci/check-format.sh
+            sh .ci/coding_style.sh
             echo "Coding Style Checking Finished"
       shell: bash
