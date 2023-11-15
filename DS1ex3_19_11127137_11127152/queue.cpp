@@ -213,6 +213,29 @@ inline void case1(string file) { // file format: 401,402...
 }
 vector<order> success;
 vector<order> fail;
+
+void ProcessOrder(int &now, order o) {
+    if (now > o.Timeout) {
+        cout << "Order " << o.OID << " is cancelled, now=" << now << endl;
+        fail.push_back(o);
+        return;
+    }
+    int finish = now + o.Duration;
+    if (finish > o.Timeout) {
+        // cancel
+
+        now = o.Timeout;
+        cout << "Timeout when processing, Order " << o.OID << " is cancelled, now=" << now << endl;
+        fail.push_back(o);
+    } else {
+        // process
+
+        now = finish;
+        cout << "Order " << o.OID << " is processed, now=" << now << endl;
+        success.push_back(o);
+        // success
+    }
+}
 inline void case2(string file) {
     ifstream input("sorted" + file + ".txt");
     string sch;
@@ -254,13 +277,14 @@ inline void case2(string file) {
                 while (!orders.empty()) {
                     order o2 = orders.front();
                     orders.pop();
-                    if (now > o2.Timeout) {
+                    ProcessOrder(now, o2);
+                    /*if (now > o2.Timeout) {
                         cout << "Order " << o2.OID << " is cancelled, now=" << now << endl;
                         fail.push_back(o2);
                         continue;
                     }
                     int finish = now + o2.Duration;
-                    if (finish > o2.Timeout) {
+                    if (finish >= o2.Timeout) {
                         // cancel when processing
 
                         now = o2.Timeout;
@@ -274,7 +298,7 @@ inline void case2(string file) {
                         cout << "Order " << o2.OID << " is processed, now=" << now << endl;
                         success.push_back(o2);
                         // success
-                    }
+                    }*/
                 }
 
                 if (now <= o.Arrival) {
@@ -312,19 +336,7 @@ inline void case2(string file) {
     while (!orders.empty()) {
         order o = orders.front();
         orders.pop();
-        int finish = now + o.Duration;
-        if (finish >= o.Timeout) {
-            // cancel
-            cout << "Timeout, Order " << o.OID << " is cancelled." << endl;
-            fail.push_back(o);
-            now = o.Timeout;
-        } else {
-            // process
-            cout << "Order " << o.OID << " is processed." << endl;
-            success.push_back(o);
-            now = finish;
-            // success
-        }
+        ProcessOrder(now, o);
     }
 
     cout << "\033[1;32m"
@@ -367,6 +379,8 @@ signed main() {
             cout << "Please enter the file number: ";
             cin >> file;
             case2(file);
+            success.clear();
+            fail.clear();
         }
     } while (command != 0);
     // cerr << "Time: " << (double)clock() / (double)CLOCKS_PER_SEC << '\n';
