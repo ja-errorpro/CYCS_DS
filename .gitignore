@@ -1,0 +1,4 @@
+*.exe
+!*DEMO.exe
+!*SHOW.exe
+!*QUIZ.exe
