@@ -2,12 +2,12 @@
 	OID	Abort	Delay
 [1]	108	6	0
 [2]	105	10	0
-[3]	104	11	0
-[4]	112	13	8
-[5]	103	15	9
-[6]	106	17	11
+[3]	112	13	8
+[4]	103	15	9
+[5]	106	17	11
+[6]	104	22	11
 	[Jobs Done]
 	OID	Departure	Delay
-[1]	101	12	0
-[Average Delay]	4.00 ms
+[1]	101	11	0
+[Average Delay]	5.57 ms
 [Success Rate]	14.29 %

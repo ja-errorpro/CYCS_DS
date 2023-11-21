@@ -162,6 +162,12 @@ struct Queue {
 };
 struct order {
     int OID, Arrival, Duration, Timeout;
+    bool operator<(const order &o) const {
+        if (Arrival == o.Arrival) {
+            return OID < o.OID;
+        }
+        return Arrival < o.Arrival;
+    }
 };
 struct Cancel {
     int OID, Delay, Time;
@@ -187,6 +193,7 @@ void order_shell_sort(vector<order> &a) {
     }
 }
 inline void case1(string file) { // file format: 401,402...
+    chrono::steady_clock::time_point start = chrono::steady_clock::now();
     ifstream input("input" + file + ".txt");
     string sch;
     for (int i = 0; i < 4; ++i) {
@@ -201,13 +208,24 @@ inline void case1(string file) { // file format: 401,402...
         orders.push_back(o);
         n++;
     }
+    chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    auto elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
+    cout << "Reading data: " << elapsed << '\n';
+    start = chrono::steady_clock::now();
     order_shell_sort(orders);
+    end = chrono::steady_clock::now();
+    elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
+    cout << "Sorting data: " << elapsed << '\n';
+    start = chrono::steady_clock::now();
     ofstream output("sorted" + file + ".txt", ios::out);
-    output << "OID\tArrival\tDuration\tTimeout\n";
+    output << "OID\tArrival\tDuration\tTimeOut\n";
     for (int i = 0; i < n; ++i) {
-        output << orders[i].OID << ' ' << orders[i].Arrival << ' ' << orders[i].Duration << ' '
+        output << orders[i].OID << '\t' << orders[i].Arrival << '\t' << orders[i].Duration << '\t'
                << orders[i].Timeout << endl;
     }
+    end = chrono::steady_clock::now();
+    elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
+    cout << "Writing data: " << elapsed << '\n';
     output.close();
     input.close();
 }
@@ -249,7 +267,7 @@ inline void case2(string file) {
         order o;
         o.OID = stoi(sch);
         input >> o.Arrival >> o.Duration >> o.Timeout;
-        if (now < o.Arrival && orders.empty()) {
+        if (now < o.Arrival && orders.empty()) { // idle
             now = o.Arrival;
         }
         if (now > o.Arrival) {
@@ -373,7 +391,11 @@ signed main() {
             string file;
             cout << "Please enter the file number: ";
             cin >> file;
+            chrono::steady_clock::time_point start = chrono::steady_clock::now();
             case1(file);
+            chrono::steady_clock::time_point end = chrono::steady_clock::now();
+            auto elapsed = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+            cout << "Time: " << elapsed << '\n';
         } else if (command == 2) {
             string file;
             cout << "Please enter the file number: ";
