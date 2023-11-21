@@ -26,36 +26,36 @@ const int queueMax = 3;
 template <class T>
 class Queue {
     vector<T> q;
-    public:
 
-    int length() const {     // get the current queue length
+   public:
+    int length() const { // get the current queue length
         return q.size();
     }
 
-    bool isEmpty() const {   // check whether it is empty
+    bool isEmpty() const { // check whether it is empty
         return q.empty();
     }
 
-    bool isFull() const {    // check whether it is full
-        if(q.size() <= queueMax)
+    bool isFull() const { // check whether it is full
+        if (q.size() <= queueMax)
             return true;
         else
             return false;
     }
 
-    void push(T &input) {       // add the new element at last
+    void push(T &input) { // add the new element at last
         q.push_back(input);
     }
 
-    void getFront(T &first) {   // get the first element
+    void getFront(T &first) { // get the first element
         return q.front(first);
     }
 
-    void pop(){            // delete the first element
-       q.erase(q.begin());
+    void pop() { // delete the first element
+        q.erase(q.begin());
     }
 
-    void clearQ() {        // clean up
+    void clearQ() { // clean up
         q.clear();
     }
 
