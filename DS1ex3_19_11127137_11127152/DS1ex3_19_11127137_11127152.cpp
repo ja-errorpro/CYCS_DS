@@ -35,6 +35,13 @@ class Data {
             }
             return Arrival < p.Arrival;
         }
+        bool operator==(const Process &p) const { return (OID == p.OID && Arrival == p.Arrival); }
+        bool operator>(const Process &p) const {
+            if (Arrival == p.Arrival) {
+                return OID > p.OID;
+            }
+            return Arrival > p.Arrival;
+        }
     };
     struct Process_State {
         int OID, Finish, Delay;
@@ -48,8 +55,7 @@ class Data {
                 Process temp = p[i];
                 int j;
                 for (j = i; j >= gap; j -= gap) {
-                    // a[j]=a[j-gap];
-                    if (temp < p[j - gap]) {
+                    if (p[j - gap] > temp) {
                         p[j] = p[j - gap];
                     } else {
                         break;
@@ -77,7 +83,7 @@ class Solution {
         ifstream fp;
         ofstream fout;
         do {
-            cout << "Input a file name or file number >";
+            cout << "\nInput a file name or number: ";
             cin >> filename;
             if (filename.size() == 3) {
                 filename = "input" + filename + ".txt";
@@ -106,12 +112,20 @@ class Solution {
         }
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
         Read_Time = chrono::duration_cast<chrono::microseconds>(end - start).count();
+
+        cout << "\n\tOID\tArrival\tDuration\tTimeOut" << endl;
+        for (int i = 0; i < n; ++i) {
+            cout << "(" << i + 1 << ")"
+                 << "\t" << ProcessList[i].OID << "\t" << ProcessList[i].Arrival << "\t"
+                 << ProcessList[i].Duration << "\t" << ProcessList[i].Timeout << endl;
+        }
+
         start = chrono::steady_clock::now();
         Data::shellsort(ProcessList);
         end = chrono::steady_clock::now();
         Sort_Time = chrono::duration_cast<chrono::microseconds>(end - start).count();
         start = chrono::steady_clock::now();
-        fout << "OID\tArrival\tDuration\tTimeout" << endl;
+        fout << "OID\tArrival\tDuration\tTimeOut" << endl;
         for (int i = 0; i < n; ++i) {
             fout << ProcessList[i].OID << '\t' << ProcessList[i].Arrival << '\t' << ProcessList[i].Duration
                  << '\t' << ProcessList[i].Timeout << endl;
@@ -119,17 +133,27 @@ class Solution {
         end = chrono::steady_clock::now();
         Write_Time = chrono::duration_cast<chrono::microseconds>(end - start).count();
 
-        cout << "Reading Time: " << Read_Time << " us" << endl;
-        cout << "Sorting Time: " << Sort_Time << " us" << endl;
-        cout << "Writing Time: " << Write_Time << " us" << endl;
+        cout << "\nReading data: " << Read_Time << " us" << endl;
+        cout << "Sorting data: " << Sort_Time << " us" << endl;
+        cout << "Writing data: " << Write_Time << " us" << endl;
+
+        cout << "\nSee sorted" << filename.substr(5, 3) << ".txt" << endl;
         fp.close();
         fout.close();
     }
+    void clear() {
+        ProcessList.clear();
+        Success.clear();
+        Fail.clear();
+    }
 };
 void WriteMenu() {
-    cout << "1. Case1" << endl;
-    cout << "0. Exit" << endl;
-    cout << ">";
+    cout << "\n**** Simulate FIFO Queues by SQF *****\n"
+            "* 0. Quit                            *\n"
+            "* 1. Sort a file                     *\n"
+            "* 2. Simulate one FIFO queue         *\n"
+            "**************************************\n";
+    cout << "Input a command(0, 1, 2): ";
 }
 signed main() {
     string command;
@@ -144,6 +168,7 @@ signed main() {
         } else
             cout << "\nCommand does not Exist!!!" << endl;
         WriteMenu();
+        s.clear();
     }
     // cerr << "Time: " << (double)clock() / (double)CLOCKS_PER_SEC << '\n';
     return 0;
