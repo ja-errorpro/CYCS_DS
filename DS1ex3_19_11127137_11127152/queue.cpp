@@ -296,27 +296,6 @@ inline void case2(string file) {
                     order o2 = orders.front();
                     orders.pop();
                     ProcessOrder(now, o2);
-                    /*if (now > o2.Timeout) {
-                        cout << "Order " << o2.OID << " is cancelled, now=" << now << endl;
-                        fail.push_back(o2);
-                        continue;
-                    }
-                    int finish = now + o2.Duration;
-                    if (finish >= o2.Timeout) {
-                        // cancel when processing
-
-                        now = o2.Timeout;
-                        cout << "Timeout when processing, Order " << o2.OID << " is cancelled, now=" << now
-                             << ", finish =" << o2.Timeout << endl;
-                        fail.push_back(o2);
-                    } else {
-                        // process
-
-                        now = finish;
-                        cout << "Order " << o2.OID << " is processed, now=" << now << endl;
-                        success.push_back(o2);
-                        // success
-                    }*/
                 }
 
                 if (now <= o.Arrival) {

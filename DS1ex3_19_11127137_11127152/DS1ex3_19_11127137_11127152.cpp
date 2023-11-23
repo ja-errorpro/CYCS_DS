@@ -37,18 +37,15 @@ class Queue {
     }
 
     bool isFull() const { // check whether it is full
-        if (q.size() <= queueMax)
-            return true;
-        else
-            return false;
+        return q.size() >= queueMax;
     }
 
-    void push(T &input) { // add the new element at last
+    void push(const T &input) { // add the new element at last
         q.push_back(input);
     }
 
     void getFront(T &first) { // get the first element
-        return q.front(first);
+        first = q.front();
     }
 
     void pop() { // delete the first element
@@ -81,12 +78,14 @@ class Data {
     };
     struct Process_State {
         int OID, Finish, Delay;
+        Process_State() : OID(0), Finish(0), Delay(0) {}
+        Process_State(int o, int f, int d) : OID(o), Finish(f), Delay(d) {}
     };
 
    public:
     static void shellsort(vector<Process> &p) {
         int n = p.size();
-        for (int gap = n / 2; gap > 0; gap /= 2) {
+        for (int gap = n >> 1; gap > 0; gap >>= 1) {
             for (int i = gap; i < n; i++) {
                 Process temp = p[i];
                 int j;
@@ -112,26 +111,43 @@ class Solution {
     int64_t Read_Time;
     int64_t Sort_Time;
     int64_t Write_Time;
+    double avg_delay;
+    double success_rate;
 
    public:
+    void GetFile(ifstream &fp, ofstream &fout, string &filename, int caseNum) {
+        do {
+            cout << "\nInput a file name or number(type * to Go back): ";
+            cin >> filename;
+            if (filename == "*") {
+                return;
+            }
+            if (filename.size() == 3) {
+                if (caseNum == 1)
+                    filename = "input" + filename + ".txt";
+                else
+                    filename = "sorted" + filename + ".txt";
+            }
+            fp.open(filename.c_str());
+            if (!fp.is_open()) {
+                cout << "\n### " << filename << " does not exist! ###" << endl;
+            }
+        } while (!fp.is_open());
+        if (caseNum == 1)
+            fout.open("sorted" + filename.substr(5, 3) + ".txt");
+        else
+            fout.open("output" + filename.substr(6, 3) + ".txt");
+        return;
+    }
     void Case1() {
         string filename;
         ifstream fp;
         ofstream fout;
-        do {
-            cout << "\nInput a file name or number: ";
-            cin >> filename;
-            if (filename.size() == 3) {
-                filename = "input" + filename + ".txt";
-                fp.open(filename.c_str());
-                if (!fp.is_open()) {
-                    cout << "\nNo such file..." << endl;
-                }
-            } else if (!fp.is_open()) {
-                cout << "\nNo such file..." << endl;
-            }
-        } while (!fp.is_open());
-        fout.open("sorted" + filename.substr(5, 3) + ".txt");
+        GetFile(fp, fout, filename, 1);
+        if (filename == "*") {
+            return;
+        }
+
         chrono::steady_clock::time_point start = chrono::steady_clock::now();
         string sch;
         for (int i = 0; i < 4; ++i) {
@@ -169,13 +185,173 @@ class Solution {
         end = chrono::steady_clock::now();
         Write_Time = chrono::duration_cast<chrono::microseconds>(end - start).count();
 
-        cout << "\nReading data: " << Read_Time << " us" << endl;
-        cout << "Sorting data: " << Sort_Time << " us" << endl;
-        cout << "Writing data: " << Write_Time << " us" << endl;
+        cout << "\nReading data: " << Read_Time << " us." << endl;
+        cout << "Sorting data: " << Sort_Time << " us." << endl;
+        cout << "Writing data: " << Write_Time << " us." << endl;
 
         cout << "\nSee sorted" << filename.substr(5, 3) << ".txt" << endl;
         fp.close();
         fout.close();
+    }
+
+    void ProcessOrder(int &now, Process o) {
+        if (now > o.Timeout) {
+            // cout << "Order " << o.OID << " is cancelled, now=" << now << endl;
+            Fail.push_back(Process_State(o.OID, now, now - o.Arrival));
+            return;
+        }
+        int finish = now + o.Duration;
+        if (finish > o.Timeout) {
+            // cancel
+            now = o.Timeout;
+            // cout << "Timeout when processing, Order " << o.OID << " is cancelled, now=" << now << endl;
+            Fail.push_back(Process_State(o.OID, o.Timeout, o.Timeout - o.Arrival));
+        } else {
+            // process
+
+            Success.push_back(Process_State(o.OID, finish, now - o.Arrival));
+            now = finish;
+            // cout << "Order " << o.OID << " is processed, now=" << now << endl;
+            //  success
+        }
+    }
+    void ProcessQueue(int &now, Queue<Process> &orders) {
+        while (!orders.isEmpty()) {
+            Process o;
+            orders.getFront(o);
+            orders.pop();
+            ProcessOrder(now, o);
+        }
+    }
+    void WriteOutput(ofstream &fout) {
+        fout << "\t[Abort Jobs]" << endl;
+        fout << "\tOID\tAbort\tDelay" << endl;
+        int i = 1;
+        avg_delay = 0;
+        for (auto o : Fail) {
+            fout << "[" << i << "]\t" << o.OID << "\t" << o.Finish << "\t" << o.Delay << endl;
+            avg_delay += o.Delay;
+            i++;
+        }
+
+        fout << "\t[Jobs Done]" << endl;
+        fout << "\tOID\tDeparture\tDelay" << endl;
+        i = 1;
+        for (auto o : Success) {
+            fout << "[" << i << "]\t" << o.OID << "\t" << o.Finish << "\t" << o.Delay << endl;
+            avg_delay += o.Delay;
+            i++;
+        }
+        avg_delay /= (Success.size() + Fail.size());
+        success_rate = (double)Success.size() / (Success.size() + Fail.size()) * 100;
+        fout.setf(ios::fixed);
+        fout.precision(2);
+        fout << "[Average Delay]\t" << avg_delay << " ms" << endl;
+        fout << "[Success Rate]\t" << success_rate << " %" << endl;
+    }
+    void Case2() {
+        string filename;
+        ifstream fp;
+        ofstream fout;
+        GetFile(fp, fout, filename, 2);
+        if (filename == "*") {
+            return;
+        }
+
+        cout << "\nThe simulation is running..." << endl;
+
+        string sch;
+        for (int i = 0; i < 4; ++i) {
+            fp >> sch; // read the first row
+        }
+        Queue<Process> orders;
+        int now = 0;
+        while (fp >> sch) {
+            Process o;
+            o.OID = stoi(sch);
+            fp >> o.Arrival >> o.Duration >> o.Timeout;
+            if (now < o.Arrival && orders.isEmpty()) { // idle
+                now = o.Arrival;
+            }
+            if (now > o.Arrival) {
+                if (!orders.isFull()) {
+                    orders.push(o);
+                    // cout << "CPU busy, Order " << o.OID << " is enqueued, now=" << now << endl;
+                } else {
+                    // cout << "Queue full, Order " << o.OID << " is rejected, now=" << now << endl;
+                    Process_State ps(o.OID, o.Arrival, 0);
+                    Fail.push_back(ps);
+                    // cancel
+                }
+
+                continue;
+            }
+            int finish = now + o.Duration;
+            if (finish > o.Timeout) {
+                // cancel
+
+                now = o.Timeout;
+                // cout << "Timeout when processing, Order " << o.OID << " is cancelled, now=" << now << endl;
+                Process_State ps(o.OID, o.Timeout, o.Timeout - o.Arrival);
+                Fail.push_back(ps);
+            } else {
+                // process
+                if (!orders.isEmpty()) { // CPU busy
+                    ProcessQueue(now, orders);
+
+                    if (now <= o.Arrival) {
+                        now = o.Arrival;
+                        int finish = now + o.Duration;
+                        if (finish > o.Timeout) {
+                            // cancel
+
+                            now = o.Timeout;
+                            // cout << "Timeout when processing, Order " << o.OID << " is cancelled, now=" <<
+                            // now
+                            //      << endl;
+                            Fail.push_back(Process_State(o.OID, o.Timeout, o.Timeout - o.Arrival));
+                        } else {
+                            // process
+
+                            Success.push_back(Process_State(o.OID, finish, now - o.Arrival));
+                            now = finish;
+                            // cout << "Order " << o.OID << " is processed, now=" << finish << endl;
+                            //  success
+                        }
+                    } else {
+                        orders.push(o);
+                        // cout << "CPU busy, Order " << o.OID << " is enqueued, now=" << now << endl;
+                    }
+                } else {
+                    // CPU idle, deal process immediately
+                    Success.push_back(Process_State(o.OID, finish, now - o.Arrival));
+                    now = finish;
+                    // cout << "CPU idle, Order " << o.OID << " is processed, now=" << now << endl;
+                }
+            }
+        }
+
+        ProcessQueue(now, orders);
+
+#ifdef DEBUG
+        cout << "\033[1;32m"
+             << "Success: \n";
+        for (auto o : Success) {
+            cout << o.OID << ' ' << o.Finish << ' ' << o.Delay << endl;
+        }
+        cout << "\033[0m" << endl;
+
+        cout << "\033[1;31m"
+             << "Fail: \n";
+        for (auto o : Fail) {
+            cout << o.OID << ' ' << o.Finish << ' ' << o.Delay << endl;
+        }
+        cout << "\033[0m" << endl;
+#endif
+
+        WriteOutput(fout);
+        cout << "See output" << filename.substr(6, 3) << ".txt" << endl;
+        fp.close();
     }
     void clear() {
         ProcessList.clear();
@@ -201,6 +377,8 @@ signed main() {
         if (command == "1") {
             s.Case1();
             // cerr << "\033[1;32mTask Passed\033[0m" << endl;
+        } else if (command == "2") {
+            s.Case2();
         } else
             cout << "\nCommand does not Exist!!!" << endl;
         WriteMenu();
