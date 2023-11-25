@@ -133,10 +133,8 @@ class Solution {
                 cout << "\n### " << filename << " does not exist! ###" << endl;
             }
         } while (!fp.is_open());
-        if (caseNum == 1)
-            fout.open("sorted" + filename.substr(5, 3) + ".txt");
-        else
-            fout.open("output" + filename.substr(6, 3) + ".txt");
+        if (caseNum == 1) fout.open("sorted" + filename.substr(5, 3) + ".txt");
+
         return;
     }
     void Case1() {
@@ -196,7 +194,7 @@ class Solution {
 
     void ProcessOrder(int &now, Process o) {
         if (now > o.Timeout) {
-            // cout << "Order " << o.OID << " is cancelled, now=" << now << endl;
+            cout << "\033[1;31mOrder " << o.OID << " is cancelled, now=" << now << "\033[0m" << endl;
             Fail.push_back(Process_State(o.OID, now, now - o.Arrival));
             return;
         }
@@ -204,14 +202,16 @@ class Solution {
         if (finish > o.Timeout) {
             // cancel
             now = o.Timeout;
-            // cout << "Timeout when processing, Order " << o.OID << " is cancelled, now=" << now << endl;
+            cout << "\033[1;31mTimeout when processing, Order " << o.OID << " is cancelled, now=" << now
+                 << "\033[0m" << endl;
             Fail.push_back(Process_State(o.OID, o.Timeout, o.Timeout - o.Arrival));
         } else {
             // process
 
             Success.push_back(Process_State(o.OID, finish, now - o.Arrival));
             now = finish;
-            // cout << "Order " << o.OID << " is processed, now=" << now << endl;
+            cout << "\033[1;32mOrder " << o.OID << " in Queue is processed, now=" << finish << "\033[0m"
+                 << endl;
             //  success
         }
     }
@@ -223,25 +223,28 @@ class Solution {
             ProcessOrder(now, o);
         }
     }
-    void WriteOutput(ofstream &fout) {
-        fout << "\t[Abort Jobs]" << endl;
-        fout << "\tOID\tAbort\tDelay" << endl;
+    void WriteOutput() {
+        cout << "\033[1;31m"
+             << "\t[Abort Jobs]\n";
+        cout << "\tOID\tAbort\tDelay" << endl;
         int i = 1;
-        avg_delay = 0;
         for (auto o : Fail) {
-            fout << "[" << i << "]\t" << o.OID << "\t" << o.Finish << "\t" << o.Delay << endl;
-            avg_delay += o.Delay;
+            cout << "[" << i << "]\t" << o.OID << "\t" << o.Finish << "\t" << o.Delay << endl;
             i++;
+            avg_delay += o.Delay;
         }
+        cout << "\033[0m" << endl;
 
-        fout << "\t[Jobs Done]" << endl;
-        fout << "\tOID\tDeparture\tDelay" << endl;
+        cout << "\033[1;32m"
+             << "\t[Jobs Done]\n";
+        cout << "\tOID\tDeparture\tDelay" << endl;
         i = 1;
         for (auto o : Success) {
-            fout << "[" << i << "]\t" << o.OID << "\t" << o.Finish << "\t" << o.Delay << endl;
-            avg_delay += o.Delay;
+            cout << "[" << i << "]\t" << o.OID << "\t" << o.Finish << "\t" << o.Delay << endl;
             i++;
+            avg_delay += o.Delay;
         }
+        cout << "\033[0m" << endl;
         if (Success.size() + Fail.size() == 0) {
             avg_delay = 0;
             success_rate = 0;
@@ -249,10 +252,10 @@ class Solution {
             avg_delay /= (Success.size() + Fail.size());
             success_rate = (double)Success.size() / (Success.size() + Fail.size()) * 100;
         }
-        fout.setf(ios::fixed);
-        fout.precision(2);
-        fout << "[Average Delay]\t" << avg_delay << " ms" << endl;
-        fout << "[Success Rate]\t" << success_rate << " %" << endl;
+        cout.setf(ios::fixed);
+        cout.precision(2);
+        cout << "[Average Delay]\t" << avg_delay << " ms" << endl;
+        cout << "[Success Rate]\t" << success_rate << " %" << endl;
     }
     void Case2() {
         string filename;
@@ -275,15 +278,25 @@ class Solution {
             Process o;
             o.OID = stoi(sch);
             fp >> o.Arrival >> o.Duration >> o.Timeout;
+            cout << "Order " << o.OID << " is coming, Arrival = " << o.Arrival << ", now = " << now << endl;
+            if (o.Arrival > o.Timeout) {
+                cout << "??? Arrival > Timeout??? Skip!!!\n";
+                continue;
+            }
             if (now < o.Arrival && orders.isEmpty()) { // idle
                 now = o.Arrival;
+            }
+            if (now > o.Timeout) {
+                continue;
             }
             if (now > o.Arrival) {
                 if (!orders.isFull()) {
                     orders.push(o);
-                    // cout << "CPU busy, Order " << o.OID << " is enqueued, now=" << now << endl;
+                    cout << "\033[1;33mOrder " << o.OID
+                         << " has arrived before, so it is enqueued, now=" << now << "\033[0m" << endl;
                 } else {
-                    // cout << "Queue full, Order " << o.OID << " is rejected, now=" << now << endl;
+                    cout << "\033[1;31mQueue is full, Order " << o.OID << " is rejected, now=" << now
+                         << "\033[0m" << endl;
                     Process_State ps(o.OID, o.Arrival, 0);
                     Fail.push_back(ps);
                     // cancel
@@ -296,12 +309,15 @@ class Solution {
                 // cancel
 
                 now = o.Timeout;
-                // cout << "Timeout when processing, Order " << o.OID << " is cancelled, now=" << now << endl;
+                cout << "\033[1;31mTimeout when processing, Order " << o.OID << " is cancelled, now=" << now
+                     << "\033[0m" << endl;
                 Process_State ps(o.OID, o.Timeout, o.Timeout - o.Arrival);
                 Fail.push_back(ps);
             } else {
                 // process
                 if (!orders.isEmpty()) { // CPU busy
+                    cout << "\033[1;35m<!>\033[0m CPU idle, but queue is not empty, process queue first"
+                         << endl;
                     ProcessQueue(now, orders);
 
                     if (now <= o.Arrival) {
@@ -311,57 +327,45 @@ class Solution {
                             // cancel
 
                             now = o.Timeout;
-                            // cout << "Timeout when processing, Order " << o.OID << " is cancelled, now=" <<
-                            // now
-                            //      << endl;
+                            cout << "\033[1;31mTimeout when processing, Order " << o.OID
+                                 << " is cancelled, now=" << now << "\033[0m" << endl;
                             Fail.push_back(Process_State(o.OID, o.Timeout, o.Timeout - o.Arrival));
                         } else {
                             // process
 
                             Success.push_back(Process_State(o.OID, finish, now - o.Arrival));
                             now = finish;
-                            // cout << "Order " << o.OID << " is processed, now=" << finish << endl;
+                            cout << "\033[1;32mCPU idle, Order " << o.OID << " is processed, now=" << finish
+                                 << "\033[0m" << endl;
                             //  success
                         }
                     } else {
                         orders.push(o);
-                        // cout << "CPU busy, Order " << o.OID << " is enqueued, now=" << now << endl;
+                        cout << "\033[1;33mOrder " << o.OID
+                             << " has arrived before, so it is enqueued, now=" << now << "\033[0m" << endl;
                     }
                 } else {
                     // CPU idle, deal process immediately
                     Success.push_back(Process_State(o.OID, finish, now - o.Arrival));
                     now = finish;
-                    // cout << "CPU idle, Order " << o.OID << " is processed, now=" << now << endl;
+                    cout << "\033[1;32mCPU idle, Order " << o.OID << " is processed, now=" << now << "\033[0m"
+                         << endl;
                 }
             }
         }
 
+        cout << "CPU idle, process queue" << endl;
         ProcessQueue(now, orders);
 
-#ifdef DEBUG
-        cout << "\033[1;32m"
-             << "Success: \n";
-        for (auto o : Success) {
-            cout << o.OID << ' ' << o.Finish << ' ' << o.Delay << endl;
-        }
-        cout << "\033[0m" << endl;
-
-        cout << "\033[1;31m"
-             << "Fail: \n";
-        for (auto o : Fail) {
-            cout << o.OID << ' ' << o.Finish << ' ' << o.Delay << endl;
-        }
-        cout << "\033[0m" << endl;
-#endif
-
-        WriteOutput(fout);
-        cout << "See output" << filename.substr(6, 3) << ".txt" << endl;
+        WriteOutput();
         fp.close();
     }
     void clear() {
         ProcessList.clear();
         Success.clear();
         Fail.clear();
+        avg_delay = 0;
+        success_rate = 0;
     }
 };
 void WriteMenu() {
