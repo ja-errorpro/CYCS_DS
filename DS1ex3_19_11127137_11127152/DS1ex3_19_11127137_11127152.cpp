@@ -172,7 +172,7 @@ class Solution {
     */
     void GetFile(ifstream &fp, ofstream &fout, string &filename, int caseNum) {
         do {
-            cout << "\nInput a file name or number(type * to Go back): ";
+            cout << "\nInput a file number: ";
             cin >> filename;
             if (filename == "*") {
                 return;
