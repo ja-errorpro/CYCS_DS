@@ -249,7 +249,6 @@ class Solution {
         output process list
     */
     void WriteProcessList() {
-        chrono::steady_clock::time_point start = chrono::steady_clock::now();
         cout << "\n\tOID\tArrival\tDuration\tTimeOut" << endl;
         int n = ProcessList.size();
         for (int i = 0; i < n; ++i) {
@@ -257,8 +256,6 @@ class Solution {
                  << "\t" << ProcessList[i].OID << "\t" << ProcessList[i].Arrival << "\t"
                  << ProcessList[i].Duration << "\t" << ProcessList[i].Timeout << endl;
         }
-        chrono::steady_clock::time_point end = chrono::steady_clock::now();
-        Write_Time = chrono::duration_cast<chrono::microseconds>(end - start).count();
     }
     /*
         output process list to ofstream
