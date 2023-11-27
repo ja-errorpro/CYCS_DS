@@ -171,27 +171,37 @@ class Solution {
     @side effect: initialize the file stream
     */
     void GetFile(ifstream &fp, ofstream &fout, string &filename, int caseNum) {
-        do {
-            cout << "\nInput a file number: ";
-            cin >> filename;
-            if (filename == "*") {
-                return;
-            }
-            if (filename.size() == 3) {
-                if (caseNum == 1)
-                    filename = "input" + filename + ".txt";
-                else
-                    filename = "sorted" + filename + ".txt";
-            }
-            fp.open(filename.c_str());
-            if (!fp.is_open()) {
-                cout << "\n### " << filename << " does not exist! ###" << endl;
-            }
-        } while (!fp.is_open());
-        if (caseNum == 1)
-            fout.open("sorted" + filename.substr(5, 3) + ".txt");
-        else
-            fout.open("output" + filename.substr(6, 3) + ".txt");
+        // do {
+        string output_filename;
+        string input_filename;
+        cout << "\nInput a file number: ";
+        cin >> filename;
+        /*
+        if (filename == "*") {
+            return;
+        }
+        if (filename.size() == 3) {
+            if (caseNum == 1)
+                filename = "input" + filename + ".txt";
+            else
+                filename = "sorted" + filename + ".txt";
+        }*/
+        if (caseNum == 1) {
+            input_filename = "input" + filename + ".txt";
+            output_filename = "sorted" + filename + ".txt";
+        } else {
+            input_filename = "sorted" + filename + ".txt";
+            output_filename = "output" + filename + ".txt";
+        }
+        fp.open(input_filename.c_str());
+        if (!fp.is_open()) {
+            cout << "\n### " << input_filename << " does not exist! ###" << endl;
+            filename = "*";
+            return;
+        }
+        //} while (!fp.is_open());
+        fout.open(output_filename);
+        filename = output_filename;
         return;
     }
     /*
@@ -202,23 +212,32 @@ class Solution {
     @side effect: initialize the file stream
     */
     void GetFile(ifstream &fp, string &filename, int caseNum) {
-        do {
-            cout << "\nInput a file name or number(type * to Go back): ";
-            cin >> filename;
-            if (filename == "*") {
-                return;
-            }
-            if (filename.size() == 3) {
-                if (caseNum == 1)
-                    filename = "input" + filename + ".txt";
-                else
-                    filename = "sorted" + filename + ".txt";
-            }
-            fp.open(filename.c_str());
-            if (!fp.is_open()) {
-                cout << "\n### " << filename << " does not exist! ###" << endl;
-            }
-        } while (!fp.is_open());
+        // do {
+        string input_filename;
+        cout << "\nInput a file number: ";
+        cin >> filename;
+        /*if (filename == "*") {
+            return;
+        }
+        if (filename.size() == 3) {
+            if (caseNum == 1)
+                filename = "input" + filename + ".txt";
+            else
+                filename = "sorted" + filename + ".txt";
+        }*/
+        if (caseNum == 1) {
+            input_filename = "input" + filename + ".txt";
+        } else {
+            input_filename = "sorted" + filename + ".txt";
+        }
+        fp.open(input_filename.c_str());
+        if (!fp.is_open()) {
+            cout << "\n### " << input_filename << " does not exist! ###" << endl;
+            filename = "*";
+            return;
+        }
+        //} while (!fp.is_open());
+        filename = input_filename;
         return;
     }
     /*
@@ -298,7 +317,7 @@ class Solution {
         cout << "Sorting data: " << Sort_Time << " us." << endl;
         cout << "Writing data: " << Write_Time << " us." << endl;
 
-        cout << "\nSee sorted" << filename.substr(5, 3) << ".txt" << endl;
+        cout << "\nSee " << filename << endl;
         fp.close();
         fout.close();
     }
@@ -309,6 +328,7 @@ class Solution {
         @side effect: update the now, and push the result to Success or Fail list
     */
     void ProcessOrder(int &now, Process o) {
+        if (now < o.Arrival) now = o.Arrival;
         if (now > o.Timeout) {
             // cout << "\033[1;31mOrder " << o.OID << " is cancelled, now=" << now << "\033[0m" << endl;
             Fail.push_back(Process_State(o.OID, now, now - o.Arrival));
@@ -338,7 +358,7 @@ class Solution {
         @side effect: update the now, and push the result to Success or Fail list
     */
     void ProcessQueue(int &now, Queue<Process> &orders) {
-        while (!orders.isEmpty()) {
+        if (!orders.isEmpty()) {
             Process o;
             orders.getFront(o);
             orders.pop();
@@ -457,7 +477,8 @@ class Solution {
                     // cout << "\033[1;35m<!>\033[0m CPU idle, but queue is not empty, process queue first"
                     //      << endl;
                     ProcessQueue(now, orders);
-
+                    orders.push(o);
+                    /*
                     if (now <= o.Arrival) {
                         now = o.Arrival;
                         int finish = now + o.Duration;
@@ -482,7 +503,7 @@ class Solution {
                         orders.push(o);
                         // cout << "\033[1;33mOrder " << o.OID
                         //      << " has arrived before, so it is enqueued, now=" << now << "\033[0m" << endl;
-                    }
+                    }*/
                 } else {
                     // CPU idle, deal process immediately
                     Success.push_back(Process_State(o.OID, finish, now - o.Arrival));
@@ -493,8 +514,7 @@ class Solution {
                 }
             }
         }
-
-        ProcessQueue(now, orders);
+        while (!orders.isEmpty()) ProcessQueue(now, orders);
     }
     /*
         simulataion of process orders and output the result
@@ -512,7 +532,7 @@ class Solution {
         ProcessList = getProcessList(fp);
         Simulate();
         WriteResult(fout);
-        cout << "See output" << filename.substr(6, 3) << ".txt" << endl;
+        cout << "See " << filename << endl;
         fp.close();
     }
     /*
