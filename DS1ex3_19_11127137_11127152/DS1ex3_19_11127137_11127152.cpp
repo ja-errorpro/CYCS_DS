@@ -462,48 +462,49 @@ class Solution {
 
                 continue;
             }
-            int finish = now + o.Duration;
-            if (finish > o.Timeout) {
-                // cancel
 
-                now = o.Timeout;
-                // cout << "\033[1;31mTimeout when processing, Order " << o.OID << " is cancelled, now=" <<
-                // now
-                //      << "\033[0m" << endl;
-                Fail.push_back(Process_State(o.OID, o.Timeout, o.Timeout - o.Arrival));
-            } else {
-                // process
-                if (!orders.isEmpty()) { // CPU busy
-                    // cout << "\033[1;35m<!>\033[0m CPU idle, but queue is not empty, process queue first"
-                    //      << endl;
-                    ProcessQueue(now, orders);
-                    orders.push(o);
-                    /*
-                    if (now <= o.Arrival) {
-                        now = o.Arrival;
-                        int finish = now + o.Duration;
-                        if (finish > o.Timeout) {
-                            // cancel
+            // process
+            if (!orders.isEmpty()) { // CPU busy
+                // cout << "\033[1;35m<!>\033[0m CPU idle, but queue is not empty, process queue first"
+                //      << endl;
+                ProcessQueue(now, orders);
+                orders.push(o);
+                /*
+                if (now <= o.Arrival) {
+                    now = o.Arrival;
+                    int finish = now + o.Duration;
+                    if (finish > o.Timeout) {
+                        // cancel
 
-                            now = o.Timeout;
-                            // cout << "\033[1;31mTimeout when processing, Order " << o.OID
-                            //      << " is cancelled, now=" << now << "\033[0m" << endl;
-                            Fail.push_back(Process_State(o.OID, o.Timeout, o.Timeout - o.Arrival));
-                        } else {
-                            // process
-
-                            Success.push_back(Process_State(o.OID, finish, now - o.Arrival));
-                            now = finish;
-                            // cout << "\033[1;32mCPU idle, Order " << o.OID << " is processed, now=" <<
-                            // finish
-                            //      << "\033[0m" << endl;
-                            //   success
-                        }
+                        now = o.Timeout;
+                        // cout << "\033[1;31mTimeout when processing, Order " << o.OID
+                        //      << " is cancelled, now=" << now << "\033[0m" << endl;
+                        Fail.push_back(Process_State(o.OID, o.Timeout, o.Timeout - o.Arrival));
                     } else {
-                        orders.push(o);
-                        // cout << "\033[1;33mOrder " << o.OID
-                        //      << " has arrived before, so it is enqueued, now=" << now << "\033[0m" << endl;
-                    }*/
+                        // process
+
+                        Success.push_back(Process_State(o.OID, finish, now - o.Arrival));
+                        now = finish;
+                        // cout << "\033[1;32mCPU idle, Order " << o.OID << " is processed, now=" <<
+                        // finish
+                        //      << "\033[0m" << endl;
+                        //   success
+                    }
+                } else {
+                    orders.push(o);
+                    // cout << "\033[1;33mOrder " << o.OID
+                    //      << " has arrived before, so it is enqueued, now=" << now << "\033[0m" << endl;
+                }*/
+            } else {
+                int finish = now + o.Duration;
+                if (finish > o.Timeout) {
+                    // cancel
+
+                    now = o.Timeout;
+                    // cout << "\033[1;31mTimeout when processing, Order " << o.OID << " is cancelled, now="
+                    // << now
+                    //      << "\033[0m" << endl;
+                    Fail.push_back(Process_State(o.OID, o.Timeout, o.Timeout - o.Arrival));
                 } else {
                     // CPU idle, deal process immediately
                     Success.push_back(Process_State(o.OID, finish, now - o.Arrival));
