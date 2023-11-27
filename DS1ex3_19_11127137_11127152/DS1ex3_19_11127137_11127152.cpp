@@ -261,7 +261,7 @@ class Solution {
             n++;
         }
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
-        Read_Time = chrono::duration_cast<chrono::microseconds>(end - start).count();
+        Read_Time = chrono::duration_cast<chrono::milliseconds>(end - start).count();
         return ProcessList;
     }
     /*
@@ -289,7 +289,7 @@ class Solution {
                  << '\t' << ProcessList[i].Timeout << endl;
         }
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
-        Write_Time = chrono::duration_cast<chrono::microseconds>(end - start).count();
+        Write_Time = chrono::duration_cast<chrono::milliseconds>(end - start).count();
     }
     /*
         sort process list
@@ -309,13 +309,13 @@ class Solution {
         chrono::steady_clock::time_point start = chrono::steady_clock::now();
         Data::shellsort(ProcessList);
         chrono::steady_clock::time_point end = chrono::steady_clock::now();
-        Sort_Time = chrono::duration_cast<chrono::microseconds>(end - start).count();
+        Sort_Time = chrono::duration_cast<chrono::milliseconds>(end - start).count();
 
         WriteProcessList(fout);
 
-        cout << "\nReading data: " << Read_Time << " us." << endl;
-        cout << "Sorting data: " << Sort_Time << " us." << endl;
-        cout << "Writing data: " << Write_Time << " us." << endl;
+        cout << "\nReading data: " << Read_Time << " ms." << endl;
+        cout << "Sorting data: " << Sort_Time << " ms." << endl;
+        cout << "Writing data: " << Write_Time << " ms." << endl;
 
         cout << "\nSee " << filename << endl;
         fp.close();
