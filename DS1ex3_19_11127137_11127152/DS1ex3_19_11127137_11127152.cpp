@@ -132,7 +132,7 @@ class Data {
    public:
     static void shellsort(vector<Process> &p) {
         int n = p.size();
-        for (int gap = n >> 1; gap > 0; gap >>= 1) {
+        for (uint32_t gap = n >> 1; gap > 0; gap >>= 1) {
             for (int i = gap; i < n; i++) {
                 Process temp = p[i];
                 int j;
