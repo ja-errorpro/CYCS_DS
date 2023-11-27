@@ -135,7 +135,7 @@ class Data {
         for (uint32_t gap = n >> 1; gap > 0; gap >>= 1) {
             for (int i = gap; i < n; i++) {
                 Process temp = p[i];
-                int j;
+                uint32_t j;
                 for (j = i; j >= gap; j -= gap) {
                     if (p[j - gap] > temp) {
                         p[j] = p[j - gap];
