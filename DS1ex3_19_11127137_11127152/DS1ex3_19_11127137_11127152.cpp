@@ -22,6 +22,16 @@ using namespace std;
 
 #define endl '\n'
 
+// #define CompileErr0rDEBUGGING
+
+template <typename... rest>
+void VERBOSE(rest... args) {
+#ifdef CompileErr0rDEBUGGING
+    cout << "\033[1;37m[\033[1;33mDEBUG\033[1;37m]\033[0m ";
+    initializer_list<int>{(cout << args, 0)...};
+#endif
+}
+
 const int queueMax = 3;
 template <class T>
 class Queue {
@@ -210,7 +220,8 @@ class ProcessSimulator {
     void ProcessOrder(int &now, Process o, int cid) {
         if (now < o.Arrival) now = o.Arrival;
         if (now > o.Timeout) {
-            // cout << "\033[1;31mOrder " << o.OID << " is cancelled, now=" << now << "\033[0m" << endl;
+            VERBOSE("\033[1;31mOrder ", o.OID, " is cancelled, CPU is ", cid, ", cpu clock = ", now,
+                    "\033[0m", endl);
             Fail.push_back(Process_State(o.OID, cid, now, now - o.Arrival));
             return;
         }
@@ -218,16 +229,16 @@ class ProcessSimulator {
         if (finish > o.Timeout) {
             // cancel
             now = o.Timeout;
-            // cout << "\033[1;31mTimeout when processing, Order " << o.OID << " is cancelled, now=" << now
-            //      << "\033[0m" << endl;
+            VERBOSE("\033[1;31mTimeout when processing, Order ", o.OID, " is cancelled, CPU is ", cid,
+                    ", cpu clock = ", now, "\033[0m", endl);
             Fail.push_back(Process_State(o.OID, cid, o.Timeout, o.Timeout - o.Arrival));
         } else {
             // process
 
             Success.push_back(Process_State(o.OID, cid, finish, now - o.Arrival));
             now = finish;
-            // cout << "\033[1;32mOrder " << o.OID << " in Queue is processed, now=" << finish << "\033[0m"
-            //     << endl;
+            VERBOSE("\033[1;32mOrder ", o.OID, " in Queue is processed, CPU is ", cid,
+                    ", cpu clock = ", finish, "\033[0m", endl);
             //  success
         }
     }
@@ -254,6 +265,7 @@ class ProcessSimulator {
         int cpu_num = CPU_Queue_arr.size();
         vector<int> cpu_curtime_arr(cpu_num, 0);
         for (auto o : ProcessList) {
+            VERBOSE("\033[1;34mOrder ", o.OID, " is coming.\033[0m", endl);
             for (int i = 0; i < cpu_num; ++i) { // if there is some idle cpu, process queue till now
                 while (!CPU_Queue_arr[i].isEmpty() && cpu_curtime_arr[i] <= o.Arrival) {
                     ProcessQueue(cpu_curtime_arr[i], CPU_Queue_arr[i], i + 1);
@@ -272,19 +284,14 @@ class ProcessSimulator {
 
             // if there is an idle cpu, process the order
             if (idle_cpu != -1) {
-                /*cout << "\033[1;35m<!>\033[0m CPU " << idle_cpu + 1 << " is idle, process order " << o.OID
-                     << endl;*/
-
                 if (cpu_curtime_arr[idle_cpu] < o.Arrival) { // there is no any order to process
                     cpu_curtime_arr[idle_cpu] = o.Arrival;   // move the time to the next order's arrival time
-                    /*cout << "\033[1;35m<!>\033[0m CPU " << idle_cpu + 1 << " is idle, process order " <<
-                       o.OID
-                         << endl;*/
+                    VERBOSE("\033[1;35m<!>\033[0m CPU ", idle_cpu + 1, " is idle, process order ", o.OID,
+                            endl);
                     ProcessOrder(cpu_curtime_arr[idle_cpu], o, idle_cpu + 1);
                 } else {
-                    /*cout << "\033[1;35m<!>\033[0m CPU " << idle_cpu + 1 << " is idle, enqueue order " <<
-                       o.OID
-                         << endl;*/
+                    VERBOSE("\033[1;35m<!>\033[0m CPU ", idle_cpu + 1, " is idle, enqueue order ", o.OID,
+                            endl);
                     CPU_Queue_arr[idle_cpu].push(o);
                 }
 
@@ -298,14 +305,13 @@ class ProcessSimulator {
                     shortest_queue = i;
                 }
             }
-            /*cout << "\033[1;35m<!>\033[0m CPU " << shortest_queue + 1 << " is chosen, enqueue order " <<
-               o.OID
-                 << endl;*/
+            VERBOSE("\033[1;35m<!>\033[0m CPU ", shortest_queue + 1, " is chosen, enqueue order ", o.OID,
+                    endl);
             if (!CPU_Queue_arr[shortest_queue].isFull()) {
                 CPU_Queue_arr[shortest_queue].push(o);
             } else { // queue is full
-                /*cout << "\033[1;31mQueue is full, Order " << o.OID
-                     << " is rejected, now=" << cpu_curtime_arr[shortest_queue] << "\033[0m" << endl;*/
+                VERBOSE("\033[1;31mQueue is full, Order ", o.OID,
+                        " is rejected, now=", cpu_curtime_arr[shortest_queue], "\033[0m", endl);
                 Fail.push_back(Process_State(o.OID, 0, o.Arrival, 0));
             }
         }
