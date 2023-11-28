@@ -165,6 +165,10 @@ class Data {
 class Solution {
     typedef Data::Process Process;
     typedef Data::Process_State Process_State;
+    struct cpu {
+        Queue<Process> queue;
+        int curtime;
+    };
     vector<Process> ProcessList;
     vector<Process_State> Success;
     vector<Process_State> Fail;
@@ -367,30 +371,8 @@ class Solution {
             //  success
         }
     }
-    void ProcessOrder(int &now, Process o, int CPUid) {
-        // if (now < o.Arrival) now = o.Arrival;
-        if (now > o.Timeout) {
-            cout << "\033[1;31mOrder " << o.OID << " is cancelled, now=" << now << "\033[0m" << endl;
-            Fail.push_back(Process_State(o.OID, CPUid, now, now - o.Arrival));
-            return;
-        }
-        int finish = now + o.Duration;
-        if (finish > o.Timeout) {
-            // cancel
-            now = o.Timeout;
-            cout << "\033[1;31mTimeout when processing, Order " << o.OID << " is cancelled, now=" << now
-                 << "\033[0m" << endl;
-            Fail.push_back(Process_State(o.OID, CPUid, o.Timeout, o.Timeout - o.Arrival));
-        } else {
-            // process
 
-            Success.push_back(Process_State(o.OID, CPUid, finish, now - o.Arrival));
-            now = finish;
-            cout << "\033[1;32mOrder " << o.OID << " in Queue " << CPUid << " is processed, now=" << finish
-                 << "\033[0m" << endl;
-            //  success
-        }
-    }
+    void delQ(vector<cpu> &CPU, int CPUid) { CPU[CPUid].queue.pop(); }
     /*
         process the orders in queue
         @param now: the current time
@@ -401,16 +383,17 @@ class Solution {
         if (!orders.isEmpty()) {
             Process o;
             orders.getFront(o);
-            orders.pop();
             ProcessOrder(now, o);
         }
     }
-    void ProcessQueue(int &now, Queue<Process> &orders, int CPUid) {
-        if (!orders.isEmpty()) {
+    void ProcessQueue(vector<cpu> &cpu, int CPUid, int &now) {
+        while (1) {
+            int ret = cpu[CPUid].curtime;
+            if (now < ret) break;
+            if (cpu[CPUid].queue.isEmpty()) break;
             Process o;
-            orders.getFront(o);
-            orders.pop();
-            ProcessOrder(now, o, CPUid);
+            cpu[CPUid].queue.getFront(o);
+            delQ(cpu, CPUid);
         }
     }
     /*
@@ -576,91 +559,66 @@ class Solution {
         }
         while (!orders.isEmpty()) ProcessQueue(now, orders);
     }
-    void Simulate(vector<Queue<Process>> &CPU_Queue_arr) {
+    void Simulate(vector<cpu> &CPU_arr) {
         int cpu_1_curtime = 0;
         int cpu_2_curtime = 0;
+        int now = 0;
+        int CPU_num = CPU_arr.size();
         for (auto o : ProcessList) {
             cout << "\033[1;34mOrder " << o.OID << " has arrived"
                  << "\033[0m" << endl;
-            cout << "Queue 1:";
-            CPU_Queue_arr[0].PrintAll();
-            cout << "Queue 2:";
-            CPU_Queue_arr[1].PrintAll();
-            /*if (cpu_1_curtime < o.Arrival && CPU_Queue_arr[0].isEmpty()) { // idle
+            // cout << "Queue 1:";
+            //  CPU_arr[0].queue.PrintAll();
+            // cout << "Queue 2:";
+            //  CPU_arr[1].queue.PrintAll();
+            /*if (cpu_1_curtime <= o.Arrival && CPU_Queue_arr[0].isEmpty()) { // idle
                 cpu_1_curtime = max(cpu_1_curtime, o.Arrival);
                 cout << "CPU 1 idle, now=" << cpu_1_curtime << endl;
-            } else if (cpu_2_curtime < o.Arrival && CPU_Queue_arr[1].isEmpty()) { // idle
+
+            } else if (cpu_2_curtime <= o.Arrival && CPU_Queue_arr[1].isEmpty()) { // idle
                 cpu_2_curtime = max(cpu_2_curtime, o.Arrival);
                 cout << "CPU 2 idle, now=" << cpu_2_curtime << endl;
             }*/
 
-            if (cpu_1_curtime > o.Arrival) {     // cpu 1 busy
-                if (cpu_2_curtime > o.Arrival) { // all cpu busy
-                    // sqf, choose the queue with less orders
-                    int min_queue_idx = CPU_Queue_arr.size() - 1;
-                    int fulled_queue_num = 0;
-                    cout << "Queue 1 length: " << CPU_Queue_arr[0].length()
-                         << ", Queue 2 length: " << CPU_Queue_arr[1].length() << endl;
-                    for (int q = CPU_Queue_arr.size() - 1; q >= 0; --q) {
-                        if (CPU_Queue_arr[q].isFull()) {
-                            fulled_queue_num++;
-                        }
-                        if (CPU_Queue_arr[q].length() <= CPU_Queue_arr[min_queue_idx].length()) {
-                            min_queue_idx = q;
-                        }
-                    }
+            for (int i = 0; i < CPU_num; ++i) {
+                ProcessQueue(CPU_arr[i].queue, i, now);
+            }
 
-                    if (fulled_queue_num == CPU_Queue_arr.size()) { // all queue is full
-                        cout << "\033[1;31mAll queues are full, Order " << o.OID << " is rejected."
-                             << "\033[0m" << endl;
-                        Fail.push_back(Process_State(o.OID, 0, o.Arrival, 0));
-                    } else {
-                        // if (min_queue_idx != CPU_Queue_arr.size()) {
-                        CPU_Queue_arr[min_queue_idx].push(o);
-                        cout << "\033[1;33mOrder " << o.OID
-                             << " has arrived before, so it is enqueued to CPU " << min_queue_idx + 1
-                             << ", cpu1=" << cpu_1_curtime << ", cpu2=" << cpu_2_curtime << "\033[0m" << endl;
-                        /*} else {
-                            cout << "\033[1;31mQueue is full, Order " << o.OID
-                                 << " is rejected, now=" << cpu_1_curtime << "\033[0m" << endl;
-                            Fail.push_back(Process_State(o.OID, o.Arrival, 0));
-                            // cancel
-                        }*/
-                    }
-
-                } else { // cpu 2 idle
-                    cout << "Queue 1 length: " << CPU_Queue_arr[0].length()
-                         << ", Queue 2 length: " << CPU_Queue_arr[1].length() << endl;
-                    if (!CPU_Queue_arr[1].isEmpty()) {
-                        cout << "CPU 2 idle, but queue is not empty, process queue first" << endl;
-                        // cpu_2_curtime = max(cpu_2_curtime, o.Arrival);
-                        ProcessQueue(cpu_2_curtime, CPU_Queue_arr[1], 2);
-                        cpu_2_curtime = max(cpu_2_curtime, o.Arrival);
-                        ProcessOrder(cpu_2_curtime, o, 2);
-                        // CPU_Queue_arr[1].push(o);
-                    } else {
-                        cpu_2_curtime = max(o.Arrival, cpu_2_curtime);
-                        ProcessOrder(cpu_2_curtime, o, 2);
-                    }
-                }
-            } else { // cpu 1 idle
-                cout << "Queue 1 length: " << CPU_Queue_arr[0].length()
-                     << ", Queue 2 length: " << CPU_Queue_arr[1].length() << endl;
-                if (!CPU_Queue_arr[0].isEmpty()) {
-                    cout << "CPU 1 idle, but queue is not empty, process queue first" << endl;
-                    // cpu_1_curtime = max(cpu_1_curtime, o.Arrival);
-                    ProcessQueue(cpu_1_curtime, CPU_Queue_arr[0], 1);
-                    cpu_1_curtime = max(cpu_1_curtime, o.Arrival);
-                    ProcessOrder(cpu_1_curtime, o, 1);
-                    // CPU_Queue_arr[0].push(o);
-                } else {
-                    cpu_1_curtime = max(cpu_1_curtime, o.Arrival);
-                    ProcessOrder(cpu_1_curtime, o, 1);
+            int idx = -1;
+            // find less arrival time
+            for (int i = 0; i < CPU_num; ++i) {
+                if (CPU_arr[i].curtime <= now) {
+                    idx = i;
+                    break;
                 }
             }
+
+            if (idx < 0) {
+                // all CPU busy
+                int minlen = 4;
+                idx = 0;
+                for (int i = 0; i < CPU_num; ++i) {
+                    if (CPU_arr[i].queue.length() < minlen) {
+                        idx = i;
+                        minlen = CPU_arr[i].queue.length();
+                    }
+                }
+                if (minlen == 3) {
+                    cout << "\033[1;31mQueue " << idx + 1 << " is full, Order " << o.OID
+                         << " is rejected, now=" << now << "\033[0m" << endl;
+                    Fail.push_back(Process_State(o.OID, idx + 1, o.Arrival, 0));
+                } else {
+                    CPU_arr[idx].queue.push(o);
+                    cout << "\033[1;33mOrder " << o.OID << " is enqueued to Queue " << idx + 1
+                         << ", now=" << now << "\033[0m" << endl;
+                }
+            } else {
+                CPU_arr[idx].curtime = now + o.Duration;
+                Success.push_back(Process_State(o.OID, idx + 1, now, now - o.Arrival));
+            }
         }
-        while (!CPU_Queue_arr[0].isEmpty()) ProcessQueue(cpu_1_curtime, CPU_Queue_arr[0], 1);
-        while (!CPU_Queue_arr[1].isEmpty()) ProcessQueue(cpu_2_curtime, CPU_Queue_arr[1], 2);
+        while (!CPU_arr[0].queue.isEmpty()) ProcessQueue(cpu_1_curtime, CPU_arr[0].queue, 1);
+        while (!CPU_arr[1].queue.isEmpty()) ProcessQueue(cpu_2_curtime, CPU_arr[1].queue, 2);
     }
     /*
         simulataion of process orders and output the result
@@ -695,7 +653,7 @@ class Solution {
 
         cout << "\nThe simulation is running..." << endl;
         ProcessList = getProcessList(fp);
-        vector<Queue<Process>> CPU_Queue_arr(2, Queue<Process>());
+        vector<cpu> CPU_Queue_arr(2);
         Simulate(CPU_Queue_arr);
         WriteResultCID(fout);
         cout << "See " << filename << endl;
