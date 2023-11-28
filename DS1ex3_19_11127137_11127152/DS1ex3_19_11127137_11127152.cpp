@@ -21,8 +21,8 @@
 using namespace std;
 
 #define endl '\n'
-const int queueMax = 3;
 
+const int queueMax = 3;
 template <class T>
 class Queue {
     struct Node { // circular doubly linked lists
@@ -69,7 +69,12 @@ class Queue {
         }
         size++;
     }
-
+    T &getFront() {
+        if (head == nullptr) {
+            cerr << "\033[1;31mQueue is empty!\033[0m" << endl;
+        }
+        return head->data;
+    }
     void getFront(T &first) {
         if (head == nullptr) {
             cerr << "\033[1;31mQueue is empty!\033[0m" << endl;
@@ -245,7 +250,7 @@ class ProcessSimulator {
         @param CPU_Queue_arr: the array of queues of CPUs
         @side effect: Push the result to Success or Fail list and update the statistic
     */
-    void Simulate(bool verbose = false) {
+    void Simulate() {
         int cpu_num = CPU_Queue_arr.size();
         vector<int> cpu_curtime_arr(cpu_num, 0);
         for (auto o : ProcessList) {
@@ -305,10 +310,17 @@ class ProcessSimulator {
             }
         }
 
-        for (int i = 0; i < cpu_num; ++i) { // process the rest orders
-            while (!CPU_Queue_arr[i].isEmpty()) {
-                ProcessQueue(cpu_curtime_arr[i], CPU_Queue_arr[i], i + 1);
+        int idx = 0;
+        while (idx >= 0) {
+            idx = -1;
+            for (int i = 0, minval = -1; i < cpu_num; ++i) { // process closest order
+                if (!CPU_Queue_arr[i].isEmpty() && (minval == -1 || minval > cpu_curtime_arr[i])) {
+                    idx = i;
+                    minval = cpu_curtime_arr[i];
+                }
             }
+            if (idx < 0) break;
+            ProcessQueue(cpu_curtime_arr[idx], CPU_Queue_arr[idx], idx + 1);
         }
 
         GetStatistic();
