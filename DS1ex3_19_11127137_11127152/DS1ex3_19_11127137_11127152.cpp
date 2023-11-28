@@ -207,7 +207,8 @@ class Solution {
             output_filename = "output" + filename + ".txt";
         } else {
             input_filename = "sorted" + filename + ".txt";
-            output_filename = "double" + filename + "2.txt";
+
+            output_filename = "double" + filename + ".txt";
         }
         fp.open(input_filename.c_str());
         if (!fp.is_open()) {
@@ -370,7 +371,8 @@ class Solution {
     void ProcessOrder(int &now, Process o, int CPUid) {
         // if (now < o.Arrival) now = o.Arrival;
         if (now > o.Timeout) {
-            cout << "\033[1;31mOrder " << o.OID << " is cancelled, now=" << now << "\033[0m" << endl;
+            // cout << "\033[1;31mOrder " << o.OID << " is cancelled, now=" << now << "\033[0m" << endl;
+
             Fail.push_back(Process_State(o.OID, CPUid, now, now - o.Arrival));
             return;
         }
@@ -378,16 +380,21 @@ class Solution {
         if (finish > o.Timeout) {
             // cancel
             now = o.Timeout;
-            cout << "\033[1;31mTimeout when processing, Order " << o.OID << " is cancelled, now=" << now
-                 << "\033[0m" << endl;
+
+            // cout << "\033[1;31mTimeout when processing, Order " << o.OID << " is cancelled,
+            // now=" << now
+            //      << "\033[0m" << endl;
+
             Fail.push_back(Process_State(o.OID, CPUid, o.Timeout, o.Timeout - o.Arrival));
         } else {
             // process
 
             Success.push_back(Process_State(o.OID, CPUid, finish, now - o.Arrival));
             now = finish;
-            cout << "\033[1;32mOrder " << o.OID << " in Queue " << CPUid << " is processed, now=" << finish
-                 << "\033[0m" << endl;
+
+            // cout << "\033[1;32mOrder " << o.OID << " in Queue " << CPUid << " is processed, now=" << finish
+            //      << "\033[0m" << endl;
+
             //  success
         }
     }
@@ -587,7 +594,9 @@ class Solution {
             CPU_Queue_arr[0].PrintAll();
             cout << "Queue 2:";
             CPU_Queue_arr[1].PrintAll();
+
 */
+
             if (!CPU_Queue_arr[0].isEmpty()) {
                 // cout << "\033[1;35m<!>\033[0m CPU " << idle_cpu + 1 << " is idle, process queue " << endl;
                 while (!CPU_Queue_arr[0].isEmpty() && cpu_curtime_arr[0] <= o.Arrival)
@@ -704,8 +713,9 @@ void WriteMenu() {
             "* 0. Quit                            *\n"
             "* 1. Sort a file                     *\n"
             "* 2. Simulate one FIFO queue         *\n"
+            "* 3. Simulate two queues by SQF      *\n"
             "**************************************\n";
-    cout << "Input a command(0, 1, 2): ";
+    cout << "Input a command(0, 1, 2, 3): ";
 }
 int main() {
     string command;
