@@ -41,12 +41,12 @@ class BST {
     };
     _TNode *root;
     int visited_count;
-    _TNode *min(_TNode *cur_ptr) {
+    _TNode *min(_TNode *cur_ptr) { // find the minimum node
         if (cur_ptr == nullptr) return nullptr;
         while (cur_ptr->left != nullptr) cur_ptr = cur_ptr->left;
         return cur_ptr;
     }
-    _TNode *max(_TNode *cur_ptr) {
+    _TNode *max(_TNode *cur_ptr) { // find the maximum node
         if (cur_ptr == nullptr) return nullptr;
         while (cur_ptr->right != nullptr) cur_ptr = cur_ptr->right;
         return cur_ptr;
@@ -74,16 +74,16 @@ class BST {
         else if (data > cur_ptr->data)
             cur_ptr->right = erase(cur_ptr->right, data);
         else {
-            if (cur_ptr->left == nullptr) {
+            if (cur_ptr->left == nullptr) { // no left child, replace with right child
                 _TNode *tmp = cur_ptr->right;
                 delete cur_ptr;
                 return tmp;
-            } else if (cur_ptr->right == nullptr) {
+            } else if (cur_ptr->right == nullptr) { // no right child, replace with left child
                 _TNode *tmp = cur_ptr->left;
                 delete cur_ptr;
                 return tmp;
             }
-            _TNode *tmp = min(cur_ptr->right);
+            _TNode *tmp = min(cur_ptr->right); // find the minimum node in right subtree
             cur_ptr->data = tmp->data;
             cur_ptr->right = erase(cur_ptr->right, tmp->data);
         }
@@ -242,11 +242,23 @@ class Dataset {
    public:
     Dataset() {}
     ~Dataset() { _clear(); }
+    /*
+        Reset the dataset
+        @side effect: clear filename and data
+    */
     void reset() {
         _clear();
         _filename.clear();
     }
+    /*
+        Check if the dataset is empty
+        @return: true if the dataset is empty, false otherwise
+    */
     bool isEmpty() const { return _data_arr.empty(); }
+    /*
+        Read the dataset from a file
+        @side effect: update filename and data
+    */
     void read() {
         if (_filename.empty()) {
             cout << "\nInput a file number: ";
@@ -327,6 +339,10 @@ class Dataset {
                  << d.data.level << '\t' << d.data.student_count << '\t' << d.data.teacher_count << '\t'
                  << d.data.graduate_count << endl;
     }
+    /*
+        Read a positive number from stdin
+        @return: the number read from stdin, -1 if the input is invalid
+    */
     int readPositiveNum() {
         string s;
         cin >> s;
@@ -411,7 +427,6 @@ class Solution {
     void case1() {
         ds.reset();
         ds.read();
-        VERBOSE("Read function finished", endl);
         ds.printHeights();
     }
     void case2(int k = 1) {
@@ -424,7 +439,7 @@ class Solution {
         } else if (k == 2) {
             ds.queryBySchoolName();
         } else {
-            cout << "\nPlease choose command 1 first!" << endl;
+            cout << "\n????Why are you here????" << endl;
             return;
         }
     }
@@ -455,7 +470,7 @@ signed main() {
         else if (command == "3")
             sol.case2(2);
         else
-            cout << "\nCommand does not Exist!!!" << endl;
+            cout << "\nCommand does not Exist!" << endl;
         WriteMenu();
     }
     // cerr << "Time: " << (double)clock() / (double)CLOCKS_PER_SEC << '\n';
