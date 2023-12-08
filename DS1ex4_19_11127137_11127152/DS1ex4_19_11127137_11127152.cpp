@@ -51,13 +51,23 @@ class BST {
         while (cur_ptr->right != nullptr) cur_ptr = cur_ptr->right;
         return cur_ptr;
     }
-    _TNode *insert(_TNode *cur_ptr, const T &data) {
-        if (cur_ptr == nullptr) return new _TNode(data);
-        if (data < cur_ptr->data)
-            cur_ptr->left = insert(cur_ptr->left, data);
-        else
-            cur_ptr->right = insert(cur_ptr->right, data);
-        return cur_ptr;
+    _TNode *insert(_TNode *root, const T &data) {
+        _TNode **cur_ptr = &root;
+        _TNode *new_node = nullptr;
+        try {
+            new_node = new _TNode(data);
+        } catch (bad_alloc &e) {
+            cout << "### Memory allocation failed! ###" << endl;
+            return root;
+        }
+        while (*cur_ptr != nullptr) {
+            if (data < (*cur_ptr)->data)
+                cur_ptr = &((*cur_ptr)->left);
+            else
+                cur_ptr = &((*cur_ptr)->right);
+        }
+        *cur_ptr = new_node;
+        return root;
     }
     _TNode *query(_TNode *cur_ptr, const T &data) {
         if (cur_ptr == nullptr) return nullptr;
