@@ -26,7 +26,7 @@ using namespace std;
 template <typename... rest>
 void VERBOSE(rest... args) {
 #ifdef CompileErr0rDEBUGGING
-    cout << "\033[1;37m[\033[1;33mDEBUG\033[1;37m]\033[0m ";
+    // cout << "\033[1;37m[\033[1;33mDEBUG\033[1;37m]\033[0m ";
     initializer_list<int>{(cout << args, 0)...};
 #endif
 }
@@ -284,33 +284,30 @@ class Dataset {
 
         _clear();
         string tmp;
-        getline(fin, tmp);
-        getline(fin, tmp);
-        getline(fin, tmp);
-        while (getline(fin, tmp)) {
+        getline(fin, tmp);          // skip title
+        getline(fin, tmp);          // skip data description
+        getline(fin, tmp);          // skip column description
+        while (getline(fin, tmp)) { // readin data by line
             stringstream ss(tmp);
             _data d;
-            string garbage, concat;
-            ss >> garbage;
-            ss >> d.school_name;
-            // VERBOSE("school_name: ", d.school_name, "\t");
-            ss >> garbage;
-            ss >> d.department_name;
-            // VERBOSE("department_name: ", d.department_name, "\t");
-            ss >> d.day_further;
-            ss >> concat;
-            d.day_further += " " + concat;
-            // VERBOSE("day_further: ", d.day_further, "\t");
-            ss >> d.level;
-            ss >> concat;
-            d.level += " " + concat;
-            // VERBOSE("level: ", d.level, "\t");
-            ss >> d.student_count;
-            // VERBOSE("student_count: ", d.student_count, "\t");
-            ss >> d.teacher_count;
-            // VERBOSE("teacher_count: ", d.teacher_count, "\t");
-            ss >> d.graduate_count;
-            // VERBOSE("graduate_count: ", d.graduate_count, endl);
+            vector<string> read_line_data_tmp;
+            while (getline(ss, tmp, '\t')) read_line_data_tmp.push_back(tmp); // split by tab
+
+            /*
+            for (auto &s : read_line_data_tmp) {
+                VERBOSE(s, '\t');
+            }
+            VERBOSE(endl);
+            */
+
+            d.school_name = read_line_data_tmp.at(1);
+            d.department_name = read_line_data_tmp.at(3);
+            d.day_further = read_line_data_tmp.at(4);
+            d.level = read_line_data_tmp.at(5);
+            d.student_count = stoi(read_line_data_tmp.at(6));
+            d.teacher_count = stoi(read_line_data_tmp.at(7));
+            d.graduate_count = stoi(read_line_data_tmp.at(8));
+            _data_arr.push_back(d);
 
             _insert(d);
             // VERBOSE("Insert function finished", endl);
