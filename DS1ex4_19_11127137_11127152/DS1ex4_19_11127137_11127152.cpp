@@ -1,4 +1,4 @@
-// 11127137, ¶À¤A®a
+// 11127137, ï¿½ï¿½ï¿½Aï¿½a
 /****************************************************/
 /*  CPP Template for School                         */
 /*  Author: CompileErr0r(YiJia)                     */
@@ -265,6 +265,11 @@ class Dataset {
         @return: true if the dataset is empty, false otherwise
     */
     bool isEmpty() const { return _data_arr.empty(); }
+    bool isDecimal(string s) {
+        for (auto c : s)
+            if (!isdigit(c)) return false;
+        return true;
+    }
     /*
         Read the dataset from a file
         @side effect: update filename and data
@@ -293,24 +298,29 @@ class Dataset {
             vector<string> read_line_data_tmp;
             while (getline(ss, tmp, '\t')) read_line_data_tmp.push_back(tmp); // split by tab
 
-            /*
-            for (auto &s : read_line_data_tmp) {
-                VERBOSE(s, '\t');
+            int read_line_data_tmp_size = read_line_data_tmp.size();
+            d.school_name =
+                read_line_data_tmp_size > 1 ? read_line_data_tmp.at(1) : ""; // read data if data exists
+            d.department_name = read_line_data_tmp_size > 3 ? read_line_data_tmp.at(3) : "";
+            d.day_further = read_line_data_tmp_size > 4 ? read_line_data_tmp.at(4) : "";
+            d.level = read_line_data_tmp_size > 5 ? read_line_data_tmp.at(5) : "";
+            if (read_line_data_tmp_size > 8) { // check if the data is valid
+                d.student_count = isDecimal(read_line_data_tmp.at(6)) ? stoi(read_line_data_tmp.at(6)) : 0;
+                d.teacher_count = isDecimal(read_line_data_tmp.at(7)) ? stoi(read_line_data_tmp.at(7)) : 0;
+                d.graduate_count = isDecimal(read_line_data_tmp.at(8)) ? stoi(read_line_data_tmp.at(8)) : 0;
+            } else {
+                d.student_count = 0;
+                d.teacher_count = 0;
+                d.graduate_count = 0;
             }
-            VERBOSE(endl);
-            */
-
-            d.school_name = read_line_data_tmp.at(1);
-            d.department_name = read_line_data_tmp.at(3);
-            d.day_further = read_line_data_tmp.at(4);
-            d.level = read_line_data_tmp.at(5);
-            d.student_count = stoi(read_line_data_tmp.at(6));
-            d.teacher_count = stoi(read_line_data_tmp.at(7));
-            d.graduate_count = stoi(read_line_data_tmp.at(8));
             _data_arr.push_back(d);
 
             _insert(d);
             // VERBOSE("Insert function finished", endl);
+        }
+        if (_data_arr.empty()) {
+            cout << "\n### Get nothing from the file " << _filename << " ! ###" << endl;
+            return;
         }
         fin.close();
         // VERBOSE("Read file: ", _filename, endl);
