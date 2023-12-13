@@ -1,4 +1,4 @@
-// 11127137, ï¿½ï¿½ï¿½Aï¿½a
+// 11127137, ¶À¤A®a, 11127152 ³¢©É·©
 /****************************************************/
 /*  CPP Template for School                         */
 /*  Author: CompileErr0r(YiJia)                     */
@@ -99,6 +99,7 @@ class BST {
         }
         return cur_ptr;
     }
+
     _TNode *clear(_TNode *cur_ptr) {
         if (cur_ptr == nullptr) return nullptr;
         clear(cur_ptr->left);
@@ -126,6 +127,19 @@ class BST {
         ans.insert(ans.end(), right.begin(), right.end());
         return ans;
     }
+
+    vector<_TNode *> inOrder(_TNode *cur_ptr, int a) {
+        vector<_TNode *> ans;
+        if (cur_ptr == nullptr) return ans;
+        vector<_TNode *> left = inOrder(cur_ptr->left, a);
+        vector<_TNode *> right = inOrder(cur_ptr->right, a);
+        ans.insert(ans.end(), left.begin(), left.end());
+        ans.push_back(cur_ptr);
+        ans.insert(ans.end(), right.begin(), right.end());
+
+        return ans;
+    }
+
     vector<T> postOrder(_TNode *cur_ptr) {
         vector<T> ans;
         if (cur_ptr == nullptr) return ans;
@@ -163,6 +177,39 @@ class BST {
         }
     }
 
+    _TNode *eraseByNode(_TNode *cur_ptr, _TNode *toDelete) {
+        if (cur_ptr == nullptr) return nullptr;
+        if (toDelete == nullptr) return cur_ptr;
+
+        cur_ptr->left = eraseByNode(cur_ptr->left, toDelete);
+        // VERBOSE("deleted left", endl);
+        cur_ptr->right = eraseByNode(cur_ptr->right, toDelete);
+        // VERBOSE("deleted right", endl);
+        if (cur_ptr == toDelete) {
+            // VERBOSE("cur_ptr == toDelete", endl);
+            return erase(cur_ptr, cur_ptr->data);
+        }
+        return cur_ptr;
+    }
+
+    _TNode *eraseBySchoolName(_TNode *cur_ptr, string school_name) {
+        if (cur_ptr == nullptr) return nullptr;
+        vector<_TNode *> allNode = inOrder(cur_ptr, 0);
+        VERBOSE("allNode.size() = ", allNode.size(), endl);
+        vector<_TNode *> toDelete;
+        for (auto &node : allNode) {
+            if (node == nullptr) continue;
+            if (node->data.data.school_name == school_name) {
+                toDelete.push_back(node);
+            }
+        }
+        VERBOSE("toDelete.size() = ", toDelete.size(), endl);
+        for (auto &node : toDelete) {
+            cur_ptr = eraseByNode(cur_ptr, node);
+        }
+        return cur_ptr;
+    }
+
    public:
     BST() : root(nullptr), visited_count(0) {}
     ~BST() {
@@ -175,6 +222,7 @@ class BST {
         // VERBOSE("Insert function finished", endl);
     }
     void erase(const T &data) { root = erase(root, data); }
+    void erasebySchoolName(const T &data) { root = eraseBySchoolName(root, data.data.school_name); }
     void clear() { root = clear(root); }
     bool empty() const { return root == nullptr; }
     vector<T> preOrder() { return preOrder(root); }
@@ -225,6 +273,9 @@ class Dataset {
         bool operator>=(_data_cmp_by_graduate_count b) const {
             return data.graduate_count >= b.data.graduate_count;
         }
+        bool cmpBySchoolName(_data_cmp_by_graduate_count b) const {
+            return data.school_name < b.data.school_name;
+        }
     };
     struct _data_cmp_by_school_name {
         _data data;
@@ -233,11 +284,16 @@ class Dataset {
         bool operator<=(_data_cmp_by_school_name b) const { return data.school_name <= b.data.school_name; }
         bool operator>(_data_cmp_by_school_name b) const { return data.school_name > b.data.school_name; }
         bool operator>=(_data_cmp_by_school_name b) const { return data.school_name >= b.data.school_name; }
+        bool cmpByGraduateCount(_data_cmp_by_school_name b) const {
+            return data.graduate_count < b.data.graduate_count;
+        }
     };
+
     vector<_data> _data_arr;
     BST<_data_cmp_by_graduate_count> _bst_by_graduate_count;
     BST<_data_cmp_by_school_name> _bst_by_school_name;
     string _filename;
+    vector<_data_cmp_by_school_name> deleted_data;
     void _insert(const _data &d) {
         _data_arr.push_back(d);
         _bst_by_graduate_count.insert({d});
@@ -247,6 +303,7 @@ class Dataset {
         _data_arr.clear();
         _bst_by_graduate_count.clear();
         _bst_by_school_name.clear();
+        deleted_data.clear();
     }
 
    public:
@@ -283,7 +340,7 @@ class Dataset {
         }
         ifstream fin(_filename);
         if (!fin.is_open()) {
-            cout << "### " << _filename << " does not exist! ###" << endl;
+            cout << "\n### " << _filename << " does not exist! ###" << endl;
             return;
         }
 
@@ -435,6 +492,45 @@ class Dataset {
                  << '\t' << d.student_count << '\t' << d.teacher_count << '\t' << d.graduate_count << endl;
         }
     }
+    void deleteData() {
+        if (_data_arr.empty()) {
+            cout << "\nThere is no data!" << endl;
+            return;
+        }
+        cout << "Input a school name: ";
+        string school_name;
+        getline(cin, school_name);
+        vector<_data_cmp_by_school_name> delete_list = _bst_by_school_name.queryAll({_data{
+            .school_name = school_name,
+        }});
+        if (delete_list.empty()) {
+            cout << "There is no match!" << endl;
+
+        } else {
+            for (auto &to_delete : delete_list) {
+                _data d = to_delete.data;
+                _bst_by_school_name.erasebySchoolName(_data_cmp_by_school_name{d});
+                _bst_by_graduate_count.erasebySchoolName(_data_cmp_by_graduate_count{d});
+                for (auto it = _data_arr.begin(); it != _data_arr.end(); it++) {
+                    if (it->school_name == d.school_name) {
+                        _data_arr.erase(it);
+                        break;
+                    }
+                }
+            }
+
+            cout << "Deleted Records:" << endl;
+            int i = 0;
+            for (auto &d : delete_list) {
+                cout << "[" << ++i << "]\t";
+                cout << d.data.school_name << '\t' << d.data.department_name << '\t' << d.data.day_further
+                     << '\t' << d.data.level << '\t' << d.data.student_count << '\t' << d.data.teacher_count
+                     << '\t' << d.data.graduate_count << endl;
+            }
+        }
+
+        printHeights();
+    }
 };
 
 class Solution {
@@ -460,6 +556,13 @@ class Solution {
             return;
         }
     }
+    void case3() {
+        if (ds.isEmpty()) {
+            cout << "\nPlease choose command 1 first!" << endl;
+            return;
+        }
+        ds.deleteData();
+    }
 };
 void WriteMenu() {
     cout << "\n*** University Graduate Information System ***\n"
@@ -467,6 +570,7 @@ void WriteMenu() {
             "* 1. Create Two Binary Search Trees          *\n"
             "* 2. Search by Number of Graduates           *\n"
             "* 3. Search by School Name                   *\n"
+            "* 4. Removal by School Name                  *\n"
             "**********************************************"
          << endl;
     cout << "Input a command(0, 1-4): ";
@@ -486,6 +590,8 @@ signed main() {
             sol.case2(1);
         else if (command == "3")
             sol.case2(2);
+        else if (command == "4")
+            sol.case3();
         else
             cout << "\nCommand does not Exist!" << endl;
         WriteMenu();
