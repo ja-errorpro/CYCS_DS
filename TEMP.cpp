@@ -18,6 +18,14 @@ using namespace std;
 
 #define endl '\n'
 
+template <typename... rest>
+void VERBOSE(rest... args) {
+#ifdef CompileErr0rDEBUGGING
+    cout << "\033[1;37m[\033[1;33mDEBUG\033[1;37m]\033[0m ";
+    initializer_list<int>{(cout << args, 0)...};
+#endif
+}
+
 class Solution {};
 void WriteMenu();
 inline void Solve();
