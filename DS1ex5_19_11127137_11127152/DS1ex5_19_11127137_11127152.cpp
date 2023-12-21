@@ -9,6 +9,7 @@
 #include <new>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 using namespace std;
@@ -313,6 +314,7 @@ class Data {
         int defense;
     };
     vector<_data> _data_arr;
+    unordered_map<int, _data> _data_hash_table;
 
     BST<int> _bst_by_hp; // BST stores the id of pokemon, sorted by hp
     MaxHeap<int> _maxheap_by_hp;
@@ -321,6 +323,7 @@ class Data {
     void _insertMaxHeap(int index, const _data &data) { _maxheap_by_hp.insert(index, data.hp); }
     void _clear() {
         _data_arr.clear();
+        _data_hash_table.clear();
         _bst_by_hp.clear();
         _maxheap_by_hp.clear();
     }
@@ -368,6 +371,7 @@ class Data {
             data.attack = stoi(read_line_data_tmp.at(6));
             data.defense = stoi(read_line_data_tmp.at(7));
             _data_arr.push_back(data);
+            _data_hash_table[i] = data;
             _insertBST(i++, data);
         }
 
@@ -418,13 +422,27 @@ class Data {
              << _data_arr[index].type1 << '\t' << setw(6) << _data_arr[index].hp << '\t'
              << _data_arr[index].attack << '\t' << _data_arr[index].defense << endl;
     }
+    void printByHashKey(int index, int w = 2, int offset = 0) {
+        if (_data_arr.empty()) {
+            cout << "\nThere is no data!" << endl;
+            return;
+        }
+        if (_data_hash_table.find(index) == _data_hash_table.end()) {
+            return;
+        }
+
+        cout << "[" << setw(w) << right << index + offset << "]\t" << left;
+        cout << _data_hash_table[index].id << '\t' << setw(24) << _data_hash_table[index].pokemon_name << '\t'
+             << setw(10) << _data_hash_table[index].type1 << '\t' << setw(6) << _data_hash_table[index].hp
+             << '\t' << _data_hash_table[index].attack << '\t' << _data_hash_table[index].defense << endl;
+    }
     void printByArray() {
         if (_data_arr.empty()) {
             cout << "\nThere is no data!" << endl;
             return;
         }
         cout << "\t#\tName                    \tType 1    \tHP\tAttack\tDefense" << endl;
-        int n = _data_arr.size();
+        int n = _data_arr.size(); // n = _data_hash_table.size();
         for (int i = 0; i < n; i++) {
             printByIndex(i, 2, 1);
         }
@@ -470,11 +488,12 @@ class Data {
         int n = _maxheap_by_hp.size();
         vector<int> heap = _maxheap_by_hp.getHeap();
         for (int i = 0; i < n; i++) {
-            cout << "[" << setw(2) << right << i << "]\t" << left;
             int index = heap[i];
-            cout << _data_arr[index].id << '\t' << setw(24) << _data_arr[index].pokemon_name << '\t'
-                 << setw(10) << _data_arr[index].type1 << '\t' << setw(6) << _data_arr[index].hp << '\t'
-                 << _data_arr[index].attack << '\t' << _data_arr[index].defense << endl;
+            cout << "[" << setw(2) << right << i << "]\t" << left;
+            cout << _data_hash_table[index].id << '\t' << setw(24) << _data_hash_table[index].pokemon_name
+                 << '\t' << setw(10) << _data_hash_table[index].type1 << '\t' << setw(6)
+                 << _data_hash_table[index].hp << '\t' << _data_hash_table[index].attack << '\t'
+                 << _data_hash_table[index].defense << endl;
         }
     }
 };
