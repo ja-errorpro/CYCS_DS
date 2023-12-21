@@ -1,4 +1,4 @@
-// 11127137 ï¿½ï¿½ï¿½Aï¿½a   11127152 ï¿½ï¿½ï¿½É·ï¿½
+// 11127137 ¶À¤A®a   11127152 ³¢©É·©
 
 #include <cstdio>
 #include <cstdlib>
@@ -127,18 +127,6 @@ class BST {
         return ans;
     }
 
-    vector<_TNode *> inOrder(_TNode *cur_ptr, int a) {
-        vector<_TNode *> ans;
-        if (cur_ptr == nullptr) return ans;
-        vector<_TNode *> left = inOrder(cur_ptr->left, a);
-        vector<_TNode *> right = inOrder(cur_ptr->right, a);
-        ans.insert(ans.end(), left.begin(), left.end());
-        ans.push_back(cur_ptr);
-        ans.insert(ans.end(), right.begin(), right.end());
-
-        return ans;
-    }
-
     vector<T> postOrder(_TNode *cur_ptr) {
         vector<T> ans;
         if (cur_ptr == nullptr) return ans;
@@ -152,26 +140,6 @@ class BST {
     int getHeight(_TNode *cur_ptr) {
         if (cur_ptr == nullptr) return 0;
         return std::max(getHeight(cur_ptr->left), getHeight(cur_ptr->right)) + 1;
-    }
-    void queryAll(_TNode *cur_ptr, const T &data, vector<T> &ans) {
-        if (cur_ptr == nullptr) return;
-        if (data == cur_ptr->data) {
-            ans.push_back(cur_ptr->data);
-            queryAll(cur_ptr->right, data, ans);
-        } else if (data < cur_ptr->data) {
-            queryAll(cur_ptr->left, data, ans);
-        } else {
-            queryAll(cur_ptr->right, data, ans);
-        }
-    }
-    void queryAllLowerBound(_TNode *cur_ptr, const T &data, vector<T> &ans) {
-        if (cur_ptr == nullptr) return;
-        if (data >= cur_ptr->data) {
-            ans.push_back(cur_ptr->data);
-            queryAllLowerBound(cur_ptr->right, data, ans);
-        } else {
-            queryAllLowerBound(cur_ptr->left, data, ans);
-        }
     }
 
    public:
@@ -194,17 +162,6 @@ class BST {
     vector<T> postOrder() { return postOrder(root); }
     int getHeight() { return getHeight(root); }
 
-    vector<T> queryAllLowerBound(const T &data) {
-        vector<T> ans;
-        queryAllLowerBound(root, data, ans);
-        return ans;
-    }
-    vector<T> queryAll(const T &data) {
-        vector<T> ans;
-        queryAll(root, data, ans);
-        return ans;
-    }
-
     vector<T> getInOrder() { return inOrder(root); }
     vector<T> getPreOrder() { return preOrder(root); }
     vector<T> getPostOrder() { return postOrder(root); }
@@ -222,18 +179,18 @@ class MaxHeap {
     vector<_HNode> _heap;
     int _size;
     void heapify(int i) {
-        int l = (i << 1) | 1;
-        int r = (i << 1) + 2;
+        int l = (i << 1) | 1; // left child index
+        int r = (i << 1) + 2; // right child index
         int largest = i;
-        if (l < _size && _heap[l].cmp_key > _heap[largest].cmp_key) largest = l;
+        if (l < _size && _heap[l].cmp_key > _heap[largest].cmp_key) largest = l; // find the largest one
         if (r < _size && _heap[r].cmp_key > _heap[largest].cmp_key) largest = r;
         if (largest != i) {
-            swap(_heap[i], _heap[largest]);
-            heapify(largest);
+            swap(_heap[i], _heap[largest]); // swap the largest one to the top
+            heapify(largest);               // heapify the subtree
         }
     }
     void _build() {
-        for (int i = (_size >> 1) - 1; i >= 0; i--) {
+        for (int i = (_size >> 1) - 1; i >= 0; i--) { // heapify from the last non-leaf node
             heapify(i);
         }
     }
@@ -241,16 +198,17 @@ class MaxHeap {
         _heap.clear();
         _size = 0;
     }
-    void _insert(const T &data, const int &cmp_key) {
+    void _insert(const T &data, const int &cmp_key) { // insert a node to the heap
         _heap.push_back(_HNode(cmp_key, data));
         _size++;
         int i = _size - 1;
-        while (i > 0 && _heap[i].cmp_key >= _heap[(i - 1) >> 1].cmp_key) {
+        while (i > 0 && _heap[i].cmp_key > _heap[(i - 1) >> 1].cmp_key) {
+            // swap with parent if cmp_key is larger than parent
             swap(_heap[i], _heap[(i - 1) >> 1]);
             i = (i - 1) >> 1;
         }
     }
-    void _pop() {
+    void _pop() { // extract the top node (max)
         swap(_heap[0], _heap[_size - 1]);
         _size--;
         heapify(0);
@@ -337,7 +295,11 @@ class Data {
     }
 
     bool isEmpty() const { return _data_arr.empty(); }
-
+    /*
+        Read data from file
+        @return: 1 for success, 0 for quit, -1 for fail
+        @side effect: update _data_arr, _data_hash_table, _bst_by_hp, _maxheap_by_hp, _filename
+    */
     int read() {
         if (_filename.empty()) {
             cout << "\nInput a file number [0: quit]: ";
@@ -377,11 +339,16 @@ class Data {
 
         if (_data_arr.empty()) {
             cout << "\n### Get nothing from the file " << _filename << " ! ###" << endl;
+            _filename.clear();
             return 0;
         }
         fin.close();
         return 1;
     }
+    /*
+        Build Max Heap from _data_arr by hp
+        @side effect: update _maxheap_by_hp
+    */
     void BuildMaxHeap() {
         if (_data_arr.empty()) {
             cout << "\nThere is no data!" << endl;
@@ -397,6 +364,9 @@ class Data {
         }
         _maxheap_by_hp.setHeap(arr, cmp_key_arr);
     }
+    /*
+        Print the height of BST
+    */
     void printBSTHeight() {
         if (_bst_by_hp.empty()) {
             cout << "\nThere is no data!" << endl;
@@ -404,6 +374,9 @@ class Data {
         }
         cout << "HP tree height = " << _bst_by_hp.getHeight() << endl;
     }
+    /*
+        Print the height of Max Heap
+    */
     void printHeapHeight() {
         if (_maxheap_by_hp.empty()) {
             cout << "\nThere is no data!" << endl;
@@ -411,6 +384,12 @@ class Data {
         }
         cout << "HP heap height = " << _maxheap_by_hp.getHeight() + 1 << endl;
     }
+    /*
+        Print the data by index
+        @param index: the index of data
+        @param w: the width of output
+        @param offset: the offset of index
+    */
     void printByIndex(int index, int w = 2, int offset = 0) {
         if (_data_arr.empty()) {
             cout << "\nThere is no data!" << endl;
@@ -422,6 +401,12 @@ class Data {
              << _data_arr[index].type1 << '\t' << setw(6) << _data_arr[index].hp << '\t'
              << _data_arr[index].attack << '\t' << _data_arr[index].defense << endl;
     }
+    /*
+        Print the data by hash key
+        @param index: the hash key of data
+        @param w: the width of output
+        @param offset: the offset of index
+    */
     void printByHashKey(int index, int w = 2, int offset = 0) {
         if (_data_arr.empty()) {
             cout << "\nThere is no data!" << endl;
@@ -436,6 +421,9 @@ class Data {
              << setw(10) << _data_hash_table[index].type1 << '\t' << setw(6) << _data_hash_table[index].hp
              << '\t' << _data_hash_table[index].attack << '\t' << _data_hash_table[index].defense << endl;
     }
+    /*
+        Print all data in array
+    */
     void printByArray() {
         if (_data_arr.empty()) {
             cout << "\nThere is no data!" << endl;
@@ -447,18 +435,27 @@ class Data {
             printByIndex(i, 2, 1);
         }
     }
+    /*
+        print the leftmost node in BST
+    */
     void printBSTLeftMost() {
         int index = _bst_by_hp.queryLeftMost();
         cout << "Leftmost node: " << endl;
         cout << "\t#\tName                    \tType 1    \tHP\tAttack\tDefense" << endl;
         printByIndex(index, 3, 1);
     }
+    /*
+        print the rightmost node in BST
+    */
     void printBSTRightMost() {
         int index = _bst_by_hp.queryRightMost();
         cout << "Rightmost node: " << endl;
         cout << "\t#\tName                    \tType 1    \tHP\tAttack\tDefense" << endl;
         printByIndex(index, 3, 1);
     }
+    /*
+        print the leftmost node in Max Heap
+    */
     void printHeapLeftMost() {
         int heap_index = 0;
         int index = _maxheap_by_hp.getLeftMost(heap_index);
@@ -469,6 +466,9 @@ class Data {
              << _data_arr[index].type1 << '\t' << setw(6) << _data_arr[index].hp << '\t'
              << _data_arr[index].attack << '\t' << _data_arr[index].defense << endl;
     }
+    /*
+        print the rightmost node in Max Heap
+    */
     void printHeapRightMost() {
         int heap_index = 0;
         int index = _maxheap_by_hp.getRightMost(heap_index);
@@ -479,6 +479,9 @@ class Data {
              << _data_arr[index].type1 << '\t' << setw(6) << _data_arr[index].hp << '\t'
              << _data_arr[index].attack << '\t' << _data_arr[index].defense << endl;
     }
+    /*
+        print the Max Heap
+    */
     void printHeap() {
         if (_maxheap_by_hp.empty()) {
             cout << "\nThere is no data!" << endl;
