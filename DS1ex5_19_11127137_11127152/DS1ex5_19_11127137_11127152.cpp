@@ -1,4 +1,4 @@
-// 11127137 ¶À¤A®a   11127152 ³¢©É·©
+// 11127137 ï¿½ï¿½ï¿½Aï¿½a   11127152 ï¿½ï¿½ï¿½É·ï¿½
 
 #include <cstdio>
 #include <cstdlib>
@@ -170,6 +170,167 @@ class BST {
 };
 
 template <class T>
+class OptimizedBST {
+   private:
+    struct _TNode {
+        int cmp_key;
+        vector<T> data;
+        _TNode *left, *right;
+        _TNode(const int c, const T &d, _TNode *l = nullptr, _TNode *r = nullptr)
+            : cmp_key(c), left(l), right(r) {
+            data.push_back(d);
+        }
+    };
+    _TNode *root;
+    _TNode *min(_TNode *cur_ptr) { // find the minimum node
+        if (cur_ptr == nullptr) return nullptr;
+        while (cur_ptr->left != nullptr) cur_ptr = cur_ptr->left;
+        return cur_ptr;
+    }
+    _TNode *max(_TNode *cur_ptr) { // find the maximum node
+        if (cur_ptr == nullptr) return nullptr;
+        while (cur_ptr->right != nullptr) cur_ptr = cur_ptr->right;
+        return cur_ptr;
+    }
+    _TNode *insert(_TNode *root, const T &data, const int &cmp_key = 0) {
+        _TNode **cur_ptr = &root;
+        _TNode *new_node = nullptr;
+        try {
+            new_node = new _TNode(cmp_key, data);
+        } catch (bad_alloc &e) {
+            cout << "### Memory allocation failed! ###" << endl;
+            return root;
+        }
+        if (root == nullptr) {
+            root = new_node;
+            return new_node;
+        }
+        while (*cur_ptr != nullptr) {
+            if (cmp_key < (*cur_ptr)->cmp_key)
+                cur_ptr = &((*cur_ptr)->left);
+            else if (cmp_key > (*cur_ptr)->cmp_key)
+                cur_ptr = &((*cur_ptr)->right);
+            else {
+                (*cur_ptr)->data.push_back(data);
+                delete new_node;
+                return root;
+            }
+        }
+        *cur_ptr = new_node;
+
+        return root;
+    }
+
+    _TNode *query(_TNode *cur_ptr, const int &cmp_key) {
+        if (cur_ptr == nullptr) return nullptr;
+        if (cmp_key == cur_ptr->cmp_key) return cur_ptr;
+        if (cmp_key < cur_ptr->cmp_key)
+            return query(cur_ptr->left, cmp_key);
+        else
+            return query(cur_ptr->right, cmp_key);
+    }
+
+    _TNode *erase(_TNode *cur_ptr, const int &cmp_key) {
+        if (cur_ptr == nullptr) return nullptr;
+        if (cmp_key < cur_ptr->cmp_key)
+            cur_ptr->left = erase(cur_ptr->left, cmp_key);
+        else if (cmp_key > cur_ptr->cmp_key)
+            cur_ptr->right = erase(cur_ptr->right, cmp_key);
+        else {
+            if (cur_ptr->left == nullptr) { // no left child, replace with right child
+                _TNode *tmp = cur_ptr->right;
+                delete cur_ptr;
+                return tmp;
+            } else if (cur_ptr->right == nullptr) { // no right child, replace with left child
+                _TNode *tmp = cur_ptr->left;
+                delete cur_ptr;
+                return tmp;
+            }
+            _TNode *tmp = min(cur_ptr->right); // find the minimum node in right subtree
+            cur_ptr->cmp_key = tmp->cmp_key;
+            cur_ptr->data = tmp->data;
+            cur_ptr->right = erase(cur_ptr->right, tmp->cmp_key);
+        }
+        return cur_ptr;
+    }
+
+    _TNode *clear(_TNode *cur_ptr) {
+        if (cur_ptr == nullptr) return nullptr;
+        clear(cur_ptr->left);
+        clear(cur_ptr->right);
+        delete cur_ptr;
+        return nullptr;
+    }
+    vector<vector<T>> preOrder(_TNode *cur_ptr) {
+        vector<vector<T>> ans;
+        if (cur_ptr == nullptr) return ans;
+        vector<vector<T>> left = preOrder(cur_ptr->left);
+        vector<vector<T>> right = preOrder(cur_ptr->right);
+        ans.push_back(cur_ptr->data);
+        ans.insert(ans.end(), left.begin(), left.end());
+        ans.insert(ans.end(), right.begin(), right.end());
+        return ans;
+    }
+    vector<vector<T>> inOrder(_TNode *cur_ptr) {
+        vector<vector<T>> ans;
+        if (cur_ptr == nullptr) return ans;
+        vector<vector<T>> left = inOrder(cur_ptr->left);
+        vector<vector<T>> right = inOrder(cur_ptr->right);
+        ans.insert(ans.end(), left.begin(), left.end());
+        ans.push_back(cur_ptr->data);
+        ans.insert(ans.end(), right.begin(), right.end());
+        return ans;
+    }
+
+    vector<vector<T>> postOrder(_TNode *cur_ptr) {
+        vector<vector<T>> ans;
+        if (cur_ptr == nullptr) return ans;
+        vector<vector<T>> left = postOrder(cur_ptr->left);
+        vector<vector<T>> right = postOrder(cur_ptr->right);
+        ans.insert(ans.end(), left.begin(), left.end());
+        ans.insert(ans.end(), right.begin(), right.end());
+        ans.push_back(cur_ptr->data);
+        return ans;
+    }
+    int getHeight(_TNode *cur_ptr) {
+        if (cur_ptr == nullptr) return 0;
+        return std::max(getHeight(cur_ptr->left), getHeight(cur_ptr->right)) + 1;
+    }
+
+    int size(_TNode *cur_ptr) {
+        if (cur_ptr == nullptr) return 0;
+        return size(cur_ptr->left) + size(cur_ptr->right) + 1;
+    }
+
+   public:
+    OptimizedBST() : root(nullptr) {}
+    ~OptimizedBST() {
+        clear();
+
+        VERBOSE("Destructor finished", endl);
+    }
+    void insert(const T &data, const int &cmp_key) {
+        root = insert(root, data, cmp_key);
+        // VERBOSE("Insert function finished", endl);
+    }
+
+    void erase(const T &data) { root = erase(root, data); }
+    void clear() { root = clear(root); }
+    bool empty() const { return root == nullptr; }
+    vector<T> preOrder() { return preOrder(root); }
+    vector<T> inOrder() { return inOrder(root); }
+    vector<T> postOrder() { return postOrder(root); }
+    int getHeight() { return getHeight(root); }
+    int size() { return size(root); }
+
+    vector<T> getInOrder() { return inOrder(root); }
+    vector<T> getPreOrder() { return preOrder(root); }
+    vector<T> getPostOrder() { return postOrder(root); }
+    vector<T> queryLeftMost() { return min(root)->data; }
+    vector<T> queryRightMost() { return max(root)->data; }
+};
+
+template <class T>
 class MaxHeap {
     struct _HNode {
         int cmp_key;
@@ -276,13 +437,15 @@ class Data {
 
     BST<int> _bst_by_hp; // BST stores the id of pokemon, sorted by hp
     MaxHeap<int> _maxheap_by_hp;
+    OptimizedBST<int> _bst_by_hp_optimized;
     string _filename;
     void _insertBST(int index, const _data &data) { _bst_by_hp.insert(index, data.hp); }
     void _insertMaxHeap(int index, const _data &data) { _maxheap_by_hp.insert(index, data.hp); }
+    void _insertOptimizedBST(int index, const _data &data) { _bst_by_hp_optimized.insert(index, data.hp); }
     void _clear() {
         _data_arr.clear();
         _data_hash_table.clear();
-        _bst_by_hp.clear();
+        _bst_by_hp_optimized.clear();
         _maxheap_by_hp.clear();
     }
 
@@ -334,7 +497,8 @@ class Data {
             data.defense = stoi(read_line_data_tmp.at(7));
             _data_arr.push_back(data);
             _data_hash_table[i] = data;
-            _insertBST(i++, data);
+            //_insertBST(i++, data);
+            _insertOptimizedBST(i++, data);
         }
 
         if (_data_arr.empty()) {
@@ -345,6 +509,22 @@ class Data {
         fin.close();
         return 1;
     }
+
+    void BuildOptimizedBST() {
+        if (_data_arr.empty()) {
+            cout << "\nThere is no data!" << endl;
+            return;
+        }
+        vector<int> cmp_key_arr;
+        for (auto &data : _data_arr) {
+            cmp_key_arr.push_back(data.hp);
+        }
+
+        for (int i = 0; i < _data_arr.size(); i++) {
+            _bst_by_hp_optimized.insert(i, cmp_key_arr[i]);
+        }
+    }
+
     /*
         Build Max Heap from _data_arr by hp
         @side effect: update _maxheap_by_hp
@@ -368,11 +548,11 @@ class Data {
         Print the height of BST
     */
     void printBSTHeight() {
-        if (_bst_by_hp.empty()) {
+        if (_bst_by_hp_optimized.empty()) {
             cout << "\nThere is no data!" << endl;
             return;
         }
-        cout << "HP tree height = " << _bst_by_hp.getHeight() << endl;
+        cout << "HP tree height = " << _bst_by_hp_optimized.getHeight() << endl;
     }
     /*
         Print the height of Max Heap
@@ -383,6 +563,17 @@ class Data {
             return;
         }
         cout << "HP heap height = " << _maxheap_by_hp.getHeight() + 1 << endl;
+    }
+
+    /*
+        Print the height of OptimizedBST
+    */
+    void printOptimizedBSTHeight() {
+        if (_bst_by_hp_optimized.empty()) {
+            cout << "\nThere is no data!" << endl;
+            return;
+        }
+        cout << "HP tree height = " << _bst_by_hp_optimized.getHeight() << endl;
     }
     /*
         Print the data by index
@@ -439,19 +630,29 @@ class Data {
         print the leftmost node in BST
     */
     void printBSTLeftMost() {
-        int index = _bst_by_hp.queryLeftMost();
+        vector<int> index = _bst_by_hp_optimized.queryLeftMost();
         cout << "Leftmost node: " << endl;
-        cout << "\t#\tName                    \tType 1    \tHP\tAttack\tDefense" << endl;
-        printByIndex(index, 3, 1);
+        // cout << "\t#\tName                    \tType 1    \tHP\tAttack\tDefense" << endl;
+        for (int i = 0; i < index.size(); i++) {
+            cout << "[" << right << index[i] + 1 << "]\t" << left;
+            cout << _data_arr[index[i]].id << '\t' << setw(24) << _data_arr[index[i]].pokemon_name << '\t'
+                 << setw(10) << _data_arr[index[i]].type1 << '\t' << setw(6) << _data_arr[index[i]].hp << '\t'
+                 << _data_arr[index[i]].attack << '\t' << _data_arr[index[i]].defense << endl;
+        }
     }
     /*
         print the rightmost node in BST
     */
     void printBSTRightMost() {
-        int index = _bst_by_hp.queryRightMost();
+        vector<int> index = _bst_by_hp_optimized.queryRightMost();
         cout << "Rightmost node: " << endl;
-        cout << "\t#\tName                    \tType 1    \tHP\tAttack\tDefense" << endl;
-        printByIndex(index, 3, 1);
+        // cout << "\t#\tName                    \tType 1    \tHP\tAttack\tDefense" << endl;
+        for (int i = 0; i < index.size(); i++) {
+            cout << "[" << right << index[i] + 1 << "]\t" << left;
+            cout << _data_arr[index[i]].id << '\t' << setw(24) << _data_arr[index[i]].pokemon_name << '\t'
+                 << setw(10) << _data_arr[index[i]].type1 << '\t' << setw(6) << _data_arr[index[i]].hp << '\t'
+                 << _data_arr[index[i]].attack << '\t' << _data_arr[index[i]].defense << endl;
+        }
     }
     /*
         print the leftmost node in Max Heap
@@ -511,7 +712,9 @@ class Solution {
         while (state == -1) state = _ds.read();
         if (state == 1) {
             _ds.printByArray();
-            _ds.printBSTHeight();
+            //_ds.BuildOptimizedBST();
+            _ds.printOptimizedBSTHeight();
+            //_ds.printBSTHeight();
             _ds.printBSTLeftMost();
             _ds.printBSTRightMost();
         }
@@ -526,6 +729,14 @@ class Solution {
         _ds.printHeapHeight();
         _ds.printHeapLeftMost();
         _ds.printHeapRightMost();
+    }
+    void case3() {
+        if (_ds.isEmpty()) {
+            cout << "\n----- Execute Mission 1 first! -----" << endl;
+            return;
+        }
+        _ds.BuildOptimizedBST();
+        _ds.printOptimizedBSTHeight();
     }
 };
 
