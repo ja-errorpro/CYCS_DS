@@ -371,6 +371,14 @@ class MaxHeap {
     }
     void _pop() { // extract the top node (max)
         swap(_heap[0], _heap[_size - 1]);
+        _heap.pop_back();
+        _size--;
+        heapify(0);
+    }
+    void _pop(T &data) { // extract the top node (max)
+        data = _heap[0].data;
+        swap(_heap[0], _heap[_size - 1]);
+        _heap.pop_back();
         _size--;
         heapify(0);
     }
@@ -409,6 +417,7 @@ class MaxHeap {
     }
     void insert(const T &data, const int &cmp_key) { _insert(data, cmp_key); }
     void pop() { _pop(); }
+    void pop(T &data) { _pop(data); }
     T top() { return _heap[0].data; }
     int size() const { return _size; }
     int getHeight() { return _getHeight(); }
@@ -700,6 +709,22 @@ class Data {
                  << _data_hash_table[index].defense << endl;
         }
     }
+    void popHeap() {
+        if (_maxheap_by_hp.empty()) {
+            cout << "\nThere is no data!" << endl;
+            return;
+        }
+        int delete_index = 0;
+        _maxheap_by_hp.pop(delete_index);
+        cout << "Delete: " << endl;
+        cout << "\t#\tName                    \tType 1    \tHP\tAttack\tDefense" << endl;
+        cout << "[" << right << delete_index << "]\t" << left;
+        cout << _data_hash_table[delete_index].id << '\t' << setw(24)
+             << _data_hash_table[delete_index].pokemon_name << '\t' << setw(10)
+             << _data_hash_table[delete_index].type1 << '\t' << setw(6) << _data_hash_table[delete_index].hp
+             << '\t' << _data_hash_table[delete_index].attack << '\t'
+             << _data_hash_table[delete_index].defense << endl;
+    }
 };
 
 class Solution {
@@ -732,11 +757,11 @@ class Solution {
     }
     void case3() {
         if (_ds.isEmpty()) {
-            cout << "\n----- Execute Mission 1 first! -----" << endl;
+            cout << "\n----- Execute Mission 2 first! -----" << endl;
             return;
         }
-        _ds.BuildOptimizedBST();
-        _ds.printOptimizedBSTHeight();
+        _ds.popHeap();
+        _ds.printHeap();
     }
 };
 
@@ -761,7 +786,9 @@ signed main() {
             // cerr << "\033[1;32mTask Passed\033[0m" << endl;
         } else if (command == "2") {
             sol.case2();
-        } else
+        } else if (command == "3")
+            sol.case3();
+        else
             cout << "\nCommand does not Exist!!!" << endl;
         WriteMenu();
     }
