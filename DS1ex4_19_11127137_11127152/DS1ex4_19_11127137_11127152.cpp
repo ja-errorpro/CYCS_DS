@@ -1,4 +1,4 @@
-// 11127137, ¶À¤A®a, 11127152 ³¢©É·©
+// 11127137, ï¿½ï¿½ï¿½Aï¿½a, 11127152 ï¿½ï¿½ï¿½É·ï¿½
 /****************************************************/
 /*  CPP Template for School                         */
 /*  Author: CompileErr0r(YiJia)                     */
@@ -370,7 +370,6 @@ class Dataset {
                 d.teacher_count = 0;
                 d.graduate_count = 0;
             }
-            _data_arr.push_back(d);
 
             _insert(d);
             // VERBOSE("Insert function finished", endl);
