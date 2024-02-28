@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <iostream>
 #include <new>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -528,8 +529,8 @@ class Data {
         for (auto &data : _data_arr) {
             cmp_key_arr.push_back(data.hp);
         }
-
-        for (int i = 0; i < _data_arr.size(); i++) {
+        int n = _data_arr.size();
+        for (int i = 0; i < n; i++) {
             _bst_by_hp_optimized.insert(i, cmp_key_arr[i]);
         }
     }
@@ -547,10 +548,8 @@ class Data {
         for (auto &data : _data_arr) {
             cmp_key_arr.push_back(data.hp);
         }
-        vector<int> arr;
-        for (int i = 0; i < _data_arr.size(); i++) {
-            arr.push_back(i);
-        }
+        vector<int> arr(_data_arr.size());
+        iota(arr.begin(), arr.end(), 0);
         _maxheap_by_hp.setHeap(arr, cmp_key_arr);
     }
     /*
@@ -642,7 +641,8 @@ class Data {
         vector<int> index = _bst_by_hp_optimized.queryLeftMost();
         cout << "Leftmost node: " << endl;
         // cout << "\t#\tName                    \tType 1    \tHP\tAttack\tDefense" << endl;
-        for (int i = 0; i < index.size(); i++) {
+        int n = index.size();
+        for (int i = 0; i < n; i++) {
             cout << "[" << right << index[i] + 1 << "]\t" << left;
             cout << _data_arr[index[i]].id << '\t' << setw(24) << _data_arr[index[i]].pokemon_name << '\t'
                  << setw(10) << _data_arr[index[i]].type1 << '\t' << setw(6) << _data_arr[index[i]].hp << '\t'
@@ -656,7 +656,8 @@ class Data {
         vector<int> index = _bst_by_hp_optimized.queryRightMost();
         cout << "Rightmost node: " << endl;
         // cout << "\t#\tName                    \tType 1    \tHP\tAttack\tDefense" << endl;
-        for (int i = 0; i < index.size(); i++) {
+        int n = index.size();
+        for (int i = 0; i < n; i++) {
             cout << "[" << right << index[i] + 1 << "]\t" << left;
             cout << _data_arr[index[i]].id << '\t' << setw(24) << _data_arr[index[i]].pokemon_name << '\t'
                  << setw(10) << _data_arr[index[i]].type1 << '\t' << setw(6) << _data_arr[index[i]].hp << '\t'
