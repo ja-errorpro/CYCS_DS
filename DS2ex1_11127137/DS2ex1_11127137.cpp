@@ -760,7 +760,7 @@ class Data {
         for (int i = 0; i < len; ++i) {
             _deap_by_student_count.insert(i, _data_arr[i].student_count);
         }
-
+#ifdef CompileErr0rDEBUGGING
         vector<int> deap = _deap_by_student_count.getDeap();
         int deap_len = deap.size();
         for (int i = 1; i <= deap_len; i++) {
@@ -768,6 +768,7 @@ class Data {
             if (floor(log2(i + 1)) != floor(log2(i + 2))) cout << endl;
         }
         cout << endl;
+#endif
     }
 
     void buildMaxHeap() {
@@ -776,6 +777,7 @@ class Data {
             _maxheap_by_student_count.insert(i, _data_arr[i].student_count);
         }
 
+#ifdef CompileErr0rDEBUGGING
         vector<int> heap = _maxheap_by_student_count.getHeap();
         int heap_len = heap.size();
         cout << _data_arr[heap[0]].student_count << endl;
@@ -784,6 +786,7 @@ class Data {
             if (floor(log2(i + 1)) != floor(log2(i + 2))) cout << endl;
         }
         cout << endl;
+#endif
     }
 
     void buildMinMaxHeap() {
@@ -792,6 +795,7 @@ class Data {
             _minmaxheap_by_graduate_count.insert(i, _data_arr[i].graduate_count);
         }
 
+#ifdef CompileErr0rDEBUGGING
         vector<int> heap = _minmaxheap_by_graduate_count.getHeap();
         int heap_len = heap.size();
         cout << _data_arr[heap[0]].graduate_count << endl;
@@ -800,6 +804,7 @@ class Data {
             if (floor(log2(i + 1)) != floor(log2(i + 2))) cout << endl;
         }
         cout << endl;
+#endif
     }
 
     void printMaxHeapInfo() {
@@ -1010,17 +1015,17 @@ class Solution {
 };
 
 void WriteMenu() {
-    cout << "\n******** Heap Construction ********\n"
-            "* 0. QUIT                         *\n"
-            "* 1. Build a max heap             *\n"
-            "* 2. Build a DEAP                 *\n"
-            "* 3. Build a minMax heap          *\n"
-            "* 4. remove min from a deap       *\n"
-            "* 5. remove max from a deap       *\n"
-            "* 6. remove min from a minMaxheap *\n"
-            "* 7. remove max from a minMaxheap *\n"
-            "***********************************\n"
-            "Input a choice(0, 1, 2, 3, 4, 5, 6, 7): ";
+    cout << "\n**** Heap Construction *****\n"
+            "* 0. QUIT                  *\n"
+            "* 1. Build a max heap      *\n"
+            "* 2. Build a DEAP          *\n"
+            //"* 3. Build a minMax heap          *\n"
+            //"* 4. remove min from a deap       *\n"
+            //"* 5. remove max from a deap       *\n"
+            //"* 6. remove min from a minMaxheap *\n"
+            //"* 7. remove max from a minMaxheap *\n"
+            "****************************\n"
+            "Input a choice(0, 1, 2): ";
 }
 
 signed main() {
@@ -1037,6 +1042,7 @@ signed main() {
             sol.case2();
         } else if (command == "3")
             sol.case3();
+#ifdef CompileErr0rDEBUGGING
         else if (command == "4")
             sol.case4();
         else if (command == "5")
@@ -1045,6 +1051,7 @@ signed main() {
             sol.case6();
         else if (command == "7")
             sol.case7();
+#endif
         else
             cout << "\nCommand does not Exist!!!" << endl;
         WriteMenu();
