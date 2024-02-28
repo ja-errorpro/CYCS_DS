@@ -1,4 +1,4 @@
-// 11127137 ï¿½ï¿½ï¿½Aï¿½a
+// 11127137 ¶À¤A®a
 
 #include <climits>
 #include <cmath>
