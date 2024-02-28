@@ -739,15 +739,16 @@ class Data {
             vector<string> read_line_data_tmp;
             string line_tmp;
             while (getline(ss, line_tmp, '\t')) read_line_data_tmp.push_back(line_tmp); // split by tab
-            data.school_id = stoi(read_line_data_tmp[0]);
-            data.school_name = read_line_data_tmp[1];
-            data.department_id = stoi(read_line_data_tmp[2]);
-            data.department_name = read_line_data_tmp[3];
-            data.day_further = read_line_data_tmp[4];
-            data.level = read_line_data_tmp[5];
-            data.student_count = stoi(read_line_data_tmp[6]);
-            data.teacher_count = stoi(read_line_data_tmp[7]);
-            data.graduate_count = stoi(read_line_data_tmp[8]);
+            int len = read_line_data_tmp.size();
+            data.school_id = (len > 0) ? stoi(read_line_data_tmp[0]) : 0;
+            data.school_name = (len > 1) ? read_line_data_tmp[1] : "";
+            data.department_id = (len > 2) ? stoi(read_line_data_tmp[2]) : 0;
+            data.department_name = (len > 3) ? read_line_data_tmp[3] : "";
+            data.day_further = (len > 4) ? read_line_data_tmp[4] : "";
+            data.level = (len > 5) ? read_line_data_tmp[5] : "";
+            data.student_count = (len > 6) ? stoi(read_line_data_tmp[6]) : 0;
+            data.teacher_count = (len > 7) ? stoi(read_line_data_tmp[7]) : 0;
+            data.graduate_count = (len > 8) ? stoi(read_line_data_tmp[8]) : 0;
             _data_arr.push_back(data);
         }
 
