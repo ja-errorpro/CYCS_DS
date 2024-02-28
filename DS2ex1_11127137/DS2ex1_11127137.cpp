@@ -1,4 +1,4 @@
-// 11127137 ¶À¤A®a
+// 11127137 ï¿½ï¿½ï¿½Aï¿½a
 
 #include <climits>
 #include <cmath>
@@ -704,6 +704,21 @@ class Data {
     void reset() {
         _clear();
         _filename.clear();
+    }
+
+    bool isDigit(const string &str) {
+        for (char c : str) {
+            if (!isdigit(c)) return false;
+        }
+        return true;
+    }
+
+    int stoi(const string &str) { // handle like "3,559" to 3559
+        string tmp;
+        for (char c : str) {
+            if (isdigit(c)) tmp += c;
+        }
+        return atoi(tmp.c_str());
     }
 
     bool isEmpty() const { return _data_arr.empty(); }
