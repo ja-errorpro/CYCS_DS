@@ -38,6 +38,10 @@ class MaxHeap {
     };
     vector<_HNode> _heap;
     int _size;
+    /*
+        Heapify the subtree rooted at i.
+        @side effect: swap the largest one to the i-th node
+    */
     void heapify(int i) {
         int l = (i << 1) | 1; // left child index
         int r = (i << 1) + 2; // right child index
@@ -49,15 +53,32 @@ class MaxHeap {
             heapify(largest);               // heapify the subtree
         }
     }
+
+    /*
+        Build the heap.
+        @side effect: call heapify from the last non-leaf node to the root
+    */
     void _build() {
         for (int i = (_size >> 1) - 1; i >= 0; i--) { // heapify from the last non-leaf node
             heapify(i);
         }
     }
+
+    /*
+        Clear the heap.
+        @side effect: clear the heap and set the size to 0
+    */
     void _clear() {
         _heap.clear();
         _size = 0;
     }
+
+    /*
+        Insert a node to the heap.
+        @param data: the data to be inserted
+        @param cmp_key: the key to compare
+        @side effect: insert a node to the heap and call heapify to maintain the heap property
+    */
     void _insert(const T &data, const int &cmp_key) { // insert a node to the heap
         _heap.push_back(_HNode(cmp_key, data));
         _size++;
@@ -68,19 +89,35 @@ class MaxHeap {
             i = (i - 1) >> 1;
         }
     }
-    void _pop() { // extract the top node (max)
+
+    /*
+        Extract the top node (max).
+        @side effect: extract the top node (max) and call heapify to maintain the heap property
+    */
+    void _pop() {
         swap(_heap[0], _heap[_size - 1]);
         _heap.pop_back();
         _size--;
         heapify(0);
     }
-    void _pop(T &data) { // extract the top node (max)
+
+    /*
+        Extract the top node (max).
+        @param data: reference to the data to be extracted
+        @side effect: extract the top node (max) and call heapify to maintain the heap property
+    */
+    void _pop(T &data) {
         data = _heap[0].data;
         swap(_heap[0], _heap[_size - 1]);
         _heap.pop_back();
         _size--;
         heapify(0);
     }
+
+    /*
+        Get the height of the heap.
+        @return: the height of the heap
+    */
     int _getHeight() {
         int h = 0;
         int i = _size - 1;
@@ -90,12 +127,24 @@ class MaxHeap {
         }
         return h;
     }
+
+    /*
+        Get the left bottom node.
+        @param index: reference to the index of the left bottom node
+        @return: the data of the left bottom node
+    */
     T _getLeftMost(int &index) {
         int i = 0;
         while ((i << 1) + 1 < _size) i = (i << 1) + 1;
         index = i;
         return _heap[i].data;
     }
+
+    /*
+        Get the bottom node.
+        @param index: reference to the index of the bottom node
+        @return: the data of the bottom node
+    */
     T _getRightMost(int &index) {
         index = _size - 1;
         return _heap[index].data;
@@ -106,6 +155,13 @@ class MaxHeap {
     ~MaxHeap() { _clear(); }
     void clear() { _clear(); }
     bool empty() const { return _size == 0; }
+
+    /*
+        Build the heap from the given array.
+        @param arr: the array to be built
+        @param cmp_key_arr: the array of the key to compare
+        @side effect: build the heap from the given array
+    */
     void setHeap(const vector<T> &arr, const vector<int> &cmp_key_arr) {
         _clear();
         for (int i = 0; i < arr.size(); i++) {
@@ -122,6 +178,11 @@ class MaxHeap {
     int getHeight() { return _getHeight(); }
     T getLeftMost(int &index) { return _getLeftMost(index); }
     T getRightMost(int &index) { return _getRightMost(index); }
+
+    /*
+        Get the content of the heap.
+        @return: the heap
+    */
     vector<T> getHeap() {
         vector<T> ans;
         for (auto &node : _heap) {
@@ -140,6 +201,11 @@ class MinHeap {
     };
     vector<_HNode> _heap;
     int _size;
+
+    /*
+        Heapify the subtree rooted at i.
+        @side effect: swap the smallest one to the i-th node
+    */
     void heapify(int i) {
         int l = (i << 1) | 1; // left child index
         int r = (i << 1) + 2; // right child index
@@ -147,19 +213,36 @@ class MinHeap {
         if (l < _size && _heap[l].cmp_key < _heap[smallest].cmp_key) smallest = l; // find the smallest one
         if (r < _size && _heap[r].cmp_key < _heap[smallest].cmp_key) smallest = r;
         if (smallest != i) {
-            swap(_heap[i], _heap[smallest]); // swap the largest one to the top
+            swap(_heap[i], _heap[smallest]); // swap the smallest one to the top
             heapify(smallest);               // heapify the subtree
         }
     }
+
+    /*
+        Build the heap.
+        @side effect: call heapify from the last non-leaf node to the root
+    */
     void _build() {
         for (int i = (_size >> 1) - 1; i >= 0; i--) { // heapify from the last non-leaf node
             heapify(i);
         }
     }
+
+    /*
+        Clear the heap.
+        @side effect: clear the heap and set the size to 0
+    */
     void _clear() {
         _heap.clear();
         _size = 0;
     }
+
+    /*
+        Insert a node to the heap.
+        @param data: the data to be inserted
+        @param cmp_key: the key to compare
+        @side effect: insert a node to the heap and call heapify to maintain the heap property
+    */
     void _insert(const T &data, const int &cmp_key) { // insert a node to the heap
         _heap.push_back(_HNode(cmp_key, data));
         _size++;
@@ -170,19 +253,35 @@ class MinHeap {
             i = (i - 1) >> 1;
         }
     }
+
+    /*
+        Extract the top node (min).
+        @side effect: extract the top node (min) and call heapify to maintain the heap property
+    */
     void _pop() { // extract the top node (max)
         swap(_heap[0], _heap[_size - 1]);
         _heap.pop_back();
         _size--;
         heapify(0);
     }
-    void _pop(T &data) { // extract the top node (max)
+
+    /*
+        Extract the top node (min).
+        @param data: reference to the data to be extracted
+        @side effect: extract the top node (min) and call heapify to maintain the heap property
+    */
+    void _pop(T &data) {
         data = _heap[0].data;
         swap(_heap[0], _heap[_size - 1]);
         _heap.pop_back();
         _size--;
         heapify(0);
     }
+
+    /*
+        Get the height of the heap.
+        @return: the height of the heap
+    */
     int _getHeight() {
         int h = 0;
         int i = _size - 1;
@@ -192,12 +291,24 @@ class MinHeap {
         }
         return h;
     }
+
+    /*
+        Get the left bottom node.
+        @param index: reference to the index of the left bottom node
+        @return: the data of the left bottom node
+    */
     T _getLeftMost(int &index) {
         int i = 0;
         while ((i << 1) + 1 < _size) i = (i << 1) + 1;
         index = i;
         return _heap[i].data;
     }
+
+    /*
+        Get the bottom node.
+        @param index: reference to the index of the bottom node
+        @return: the data of the bottom node
+    */
     T _getRightMost(int &index) {
         index = _size - 1;
         return _heap[index].data;
@@ -208,6 +319,13 @@ class MinHeap {
     ~MinHeap() { _clear(); }
     void clear() { _clear(); }
     bool empty() const { return _size == 0; }
+
+    /*
+        Build the heap from the given array.
+        @param arr: the array to be built
+        @param cmp_key_arr: the array of the key to compare
+        @side effect: build the heap from the given array
+    */
     void setHeap(const vector<T> &arr, const vector<int> &cmp_key_arr) {
         _clear();
         for (int i = 0; i < arr.size(); i++) {
@@ -224,6 +342,11 @@ class MinHeap {
     int getHeight() { return _getHeight(); }
     T getLeftMost(int &index) { return _getLeftMost(index); }
     T getRightMost(int &index) { return _getRightMost(index); }
+
+    /*
+        Get the content of the heap.
+        @return: the heap
+    */
     vector<T> getHeap() {
         vector<T> ans;
         for (auto &node : _heap) {
@@ -244,14 +367,47 @@ class Deap {
     vector<_DNode> _deap;
     int _size;
 
+    /*
+        Get the height of the double-ended heap.
+        @return: the height of the double-ended heap
+    */
     int _getHeight() { return floor(log2(_size + 1)); }
-    int _getLevel(int index) {
-        return floor(log2(index + 1)) + 1; // let root level = 1, index is 0-based
-    }
+
+    /*
+        Get the level of the node, the method suppose the index starts from 0, and the root is at level 1.
+        @param index: the index of the node
+        @return: the level of the node
+    */
+    int _getLevel(int index) { return floor(log2(index + 1)) + 1; }
+
+    /*
+        Get the parent index of the node, the method suppose the index starts from 0. If the index starts from
+       1, the parent index is (index >> 1) or (index / 2).
+        Do not call this method with index = 0, it may cause unexpected result.
+        @param index: the index of the node
+        @return: the parent index of the node
+    */
     int _getParent(int index) { return (index - 1) >> 1; }
+
+    /*
+        Get the left child index of the node, the method suppose the index starts from 0.
+        @param index: the index of the node
+        @return: the left child index of the node
+    */
     int _getLeftChild(int index) { return (index << 1) + 1; }
+
+    /*
+        Get the right child index of the node, the method suppose the index starts from 0.
+        @param index: the index of the node
+        @return: the right child index of the node
+    */
     int _getRightChild(int index) { return (index << 1) + 2; }
 
+    /*
+        Get the left bottom node.
+        @param index: reference to the index of the left bottom node
+        @return: the data of the left bottom node
+    */
     T _getLeftMost(int &index) {
         int i = 1;
         while ((i << 1) + 1 < _size) i = (i << 1) + 1;
@@ -259,11 +415,21 @@ class Deap {
         return _deap[i].data;
     }
 
+    /*
+        Get the bottom node.
+        @param index: reference to the index of the bottom node
+        @return: the data of the bottom node
+    */
     T _getRightMost(int &index) {
         index = _size - 1;
         return _deap[index].data;
     }
 
+    /*
+        Get the min heap index corresponding to the max heap index.
+        @param index: the index of the max heap
+        @return: the index of the min heap
+    */
     int _getMinHeapCorrespondingToMaxHeapIndex(int index) {
         if (index < 0) {
             throw "Invalid index";
@@ -275,6 +441,11 @@ class Deap {
         return ans;
     }
 
+    /*
+        Get the max heap index corresponding to the min heap index.
+        @param index: the index of the min heap
+        @return: the index of the max heap
+    */
     int _getMaxHeapCorrespondingToMinHeapIndex(int index) {
         if (index < 0) {
             throw "Invalid index";
@@ -284,6 +455,11 @@ class Deap {
         return ans;
     }
 
+    /*
+        Check if the node is at the min heap.
+        @param index: the index of the node
+        @return: true if the node is at the min heap level, otherwise false
+    */
     bool _atMinHeap(int index) {
         int minRoot = 1;
 
@@ -295,6 +471,12 @@ class Deap {
 
         return index == minRoot;
     }
+
+    /*
+        Get the corresponding index of the node.
+        @param index: the index of the node
+        @return: the corresponding index of the node
+    */
     int _getCorrespondingIndex(int index) {
         if (_atMinHeap(index)) {
             return _getMinHeapCorrespondingToMaxHeapIndex(index);
@@ -302,7 +484,13 @@ class Deap {
             return _getMaxHeapCorrespondingToMinHeapIndex(index);
         }
     }
-    void _minHeapify(int index) { // bottom up
+
+    /*
+        Heapify the subtree rooted at i.
+        @side effect: if the i-th node is smaller than its parent, swap the i-th node with its parent, and
+        repeat the process
+    */
+    void _minHeapify(int index) {
         int parent = _getParent(index);
         while (index > 2 && _deap.at(index).cmp_key < _deap.at(parent).cmp_key) {
             swap(_deap[index], _deap[parent]);
@@ -311,7 +499,12 @@ class Deap {
         }
     }
 
-    void _maxHeapify(int index) { // bottom up
+    /*
+        Heapify the subtree rooted at i.
+        @side effect: if the i-th node is larger than its parent, swap the i-th node with its parent, and
+        repeat the process
+    */
+    void _maxHeapify(int index) {
         int parent = _getParent(index);
         while (index > 2 && _deap.at(index).cmp_key > _deap.at(parent).cmp_key) {
             swap(_deap[index], _deap[parent]);
@@ -320,6 +513,16 @@ class Deap {
         }
     }
 
+    /*
+        Deapify the double-ended heap.
+        The method will compare the last node with the corresponding node, if the last node is in the min heap
+        and it is larger than the corresponding node, swap the two nodes to maintain the double-ended heap
+        property. Otherwise, compare the last node with its parent, if the last node is smaller than its
+        parent, swap the two nodes to maintain the double-ended heap property. After the swap, the method will
+        call minHeapify or maxHeapify to maintain the double-ended heap property in order to maintain the min
+        heap and max heap property.
+        @side effect: maintain the double-ended heap property
+    */
     void _deapify() {
         if (_size <= 2) return;
         int correspondIndex = _getCorrespondingIndex(_size - 1);
@@ -340,6 +543,17 @@ class Deap {
         }
     }
 
+    /*
+        Deapify the double-ended heap.
+        The method will compare the i-th node with the corresponding node, if the i-th node is in the min heap
+        and it is larger than the corresponding node, swap the two nodes to maintain the double-ended heap
+        property. Otherwise, compare the i-th node with its parent, if the i-th node is smaller than its
+        parent, swap the two nodes to maintain the double-ended heap property. After the swap, the method will
+        call minHeapify or maxHeapify to maintain the double-ended heap property in order to maintain the min
+        heap and max heap property.
+        @param index: the index of the node
+        @side effect: maintain the double-ended heap property
+    */
     void _deapify(int index) {
         if (index <= 2) return;
         int correspondIndex = _getCorrespondingIndex(index);
@@ -360,12 +574,27 @@ class Deap {
         }
     }
 
+    /*
+        Insert a node to the last of the double-ended heap.
+        @param data: the data to be inserted
+        @param cmp_key: the key to compare
+        @side effect: insert a node to the double-ended heap and call deapify to maintain the double-ended
+        heap property
+    */
     void _insert(const T &data, const int &cmp_key) {
         _deap.push_back(_DNode(cmp_key, data));
         _size++;
         _deapify();
     }
 
+    /*
+        Insert a node to the i-th position of the double-ended heap.
+        @param data: the data to be inserted
+        @param cmp_key: the key to compare
+        @param index: the index to insert
+        @side effect: insert a node to the double-ended heap and call deapify to maintain the double-ended
+        heap property
+    */
     void _insert(const T &data, const int &cmp_key, int index) {
         if (index == _size) {
             _insert(data, cmp_key);
@@ -375,12 +604,23 @@ class Deap {
         _deapify(index);
     }
 
+    /*
+        Clear the double-ended heap.
+        By the definition of the double-ended heap, the first node is a dummy node, so keep the first node and
+        set the size to 1.
+        @side effect: clear the double-ended heap and set the size to 1
+    */
     void _clear() {
         _deap.clear();
         _deap.push_back(_DNode(INT_MIN, T())); // dummy node
         _size = 1;
     }
 
+    /*
+        Extract the top node (min).
+        @return: the data of the top node (min)
+        @side effect: extract the top node (min) and call deapify to maintain the double-ended heap property
+    */
     T _pop_min() {
         if (_size == 1) return T();
 
@@ -412,6 +652,11 @@ class Deap {
         return pop_element.data;
     }
 
+    /*
+        Extract the top node (max).
+        @return: the data of the top node (max)
+        @side effect: extract the top node (max) and call deapify to maintain the double-ended heap property
+    */
     T _pop_max() {
         if (_size == 1) return T();
 
@@ -446,12 +691,22 @@ class Deap {
     }
     ~Deap() { _clear(); }
     void clear() { _clear(); }
+    /*
+        Check if the double-ended heap is empty.
+        The double-ended heap is empty while the size is 1.
+        @return: true if the double-ended heap is empty, otherwise false
+    */
     bool empty() const { return _size == 1; }
     void insert(const T &data, const int &cmp_key) { _insert(data, cmp_key); }
     T top() { return _deap[0].data; }
     int size() const { return _size; }
     T getLeftMost(int &index) { return _getLeftMost(index); }
     T getRightMost(int &index) { return _getRightMost(index); }
+
+    /*
+        Get the content of the double-ended heap.
+        @return: the double-ended heap
+    */
     vector<T> getDeap() {
         vector<T> ans;
         for (int i = 1; i < _size; i++) {
@@ -474,26 +729,89 @@ class MinMaxHeap {
     };
     vector<_HNode> _heap;
     int _size;
+
+    /*
+        Get the height of the min-max heap.
+        @return: the height of the min-max heap
+    */
     int _getHeight() { return floor(log2(_size + 1)); }
+
+    /*
+        Get the level of the node, the method suppose the index starts from 0, and the root is at level 1.
+        @param index: the index of the node
+        @return: the level of the node
+    */
     int _getLevel(int index) { return floor(log2(index + 1)) + 1; }
+
+    /*
+        Get the parent index of the node, the method suppose the index starts from 0. If the index starts from
+        1, the parent index is (index >> 1) or (index / 2).
+        Do not call this method with index = 0, it may cause unexpected result.
+        @param index: the index of the node
+        @return: the parent index of the node
+    */
     int _getParent(int index) { return (index - 1) >> 1; }
+
+    /*
+        Get the grand parent index of the node, the method suppose the index starts from 0.
+        @param index: the index of the node
+        @return: the grand parent index of the node
+    */
     int _getGrandParent(int index) { return _getParent(_getParent(index)); }
+
+    /*
+        Get the left child index of the node, the method suppose the index starts from 0.
+        @param index: the index of the node
+        @return: the left child index of the node
+    */
     int _getLeftChild(int index) { return (index << 1) + 1; }
+
+    /*
+        Get the right child index of the node, the method suppose the index starts from 0.
+        @param index: the index of the node
+        @return: the right child index of the node
+    */
     int _getRightChild(int index) { return (index << 1) + 2; }
 
+    /*
+        Get the left bottom node.
+        @param index: reference to the index of the left bottom node
+        @return: the data of the left bottom node
+    */
     int _getLeftMost(int &index) {
         int i = 0;
         while ((i << 1) + 1 < _size) i = (i << 1) + 1;
         index = i;
         return _heap[i].data;
     }
+
+    /*
+        Get the bottom node.
+        @param index: reference to the index of the bottom node
+        @return: the data of the bottom node
+    */
     int _getRightMost(int &index) {
         index = _size - 1;
         return _heap[index].data;
     }
+
+    /*
+        Check if the node is at the min level.
+        The method suppose the root is at level 1. By the definition of the min-max heap, the first level must
+        be the min level, and the second level must be the max level, and so on. So just check the parity of
+        the level, we can determine if the node is at the min level.
+        @param index: the index of the node
+        @return: true if the node is at the min level, otherwise false
+    */
     bool _atMinLevel(int index) { return _getLevel(index) % 2; }
     bool _atMaxLevel(int index) { return !(_getLevel(index) % 2); }
 
+    /*
+        Min Heapify the subtree rooted at i to maintain the min heap property.
+        The min heap level is at 2*n-1 levels, so it should compare with the grand parent.
+        @side effect: if the i-th node is smaller than its grand parent, swap the i-th node with its grand
+        parent, and repeat the process
+    */
     void _minHeapify(int index) { // only heapify the min level
         int grandParent = _getGrandParent(index);
         while (index > 2 && _heap.at(index).cmp_key < _heap.at(grandParent).cmp_key) {
@@ -504,6 +822,12 @@ class MinMaxHeap {
         }
     }
 
+    /*
+        Max Heapify the subtree rooted at i to maintain the max heap property.
+        The max heap level is at 2*n levels, so it should compare with the grand parent.
+        @side effect: if the i-th node is larger than its grand parent, swap the i-th node with its grand
+        parent, and repeat the process
+    */
     void _maxHeapify(int index) { // only heapify the max level
         int grandParent = _getGrandParent(index);
         while (index > 2 && _heap.at(index).cmp_key > _heap.at(grandParent).cmp_key) {
@@ -513,6 +837,15 @@ class MinMaxHeap {
         }
     }
 
+    /*
+        Min-Max Heapify the subtree rooted at i.
+        Compare the i-th node with its parent, if the i-th node is smaller than its parent, swap both of them,
+        and call minHeapify to maintain the min heap property. Otherwise, compare the i-th node with its grand
+        parent, if the i-th node is larger than its grand parent, swap both of them, and call maxHeapify to
+        maintain the max heap property.
+        @param index: the index of the node
+        @side effect: maintain the min-max heap property
+    */
     void _minMaxHeapify(int index) {
         if (_size <= 2) return;
         int parent = _getParent(index);
@@ -533,17 +866,41 @@ class MinMaxHeap {
         }
     }
 
+    /*
+        Insert a node to the min-max heap.
+        @param data: the data to be inserted
+        @param cmp_key: the key to compare
+        @side effect: insert a node to the min-max heap and call minMaxHeapify to maintain the min-max heap
+        property
+    */
     void _insert(const T &data, const int &cmp_key) {
         _heap.push_back(_HNode(cmp_key, data));
         _size++;
         _minMaxHeapify(_size - 1);
     }
 
+    /*
+        Clear the min-max heap.
+        @side effect: clear the min-max heap and set the size to 0
+    */
     void _clear() {
         _heap.clear();
         _size = 0;
     }
 
+    /*
+        Extract the top node (min).
+        After extracting the top node (min), there are three cases:
+        Case 1: the node has no child, just extract the node and return.
+        Case 2: the node has no grandchild, swap the node with the smaller child, and return.
+        Case 3: the node has grandchildren, if the node is larger than the smallest grandchild, swap both of
+        them. However, the node may be larger than the parent of the smallest grandchild, so check if the node
+        is larger than the parent of the smallest grandchild, if it is, swap the node with the parent of the
+        smallest grandchild (maintain the max heap property), and recursively call popMinHeapify with the
+        index of the smallest grandchild to maintain the min-max heap property.
+        @return: the data of the top node (min)
+        @side effect: extract the top node (min)
+    */
     void _popMinHeapify(int index) {
         int left = _getLeftChild(index);
         int right = _getRightChild(index);
@@ -576,6 +933,19 @@ class MinMaxHeap {
         }
     }
 
+    /*
+        Extract the max node.
+        After extracting the max node, there are three cases:
+        Case 1: the node has no child, just extract the node and return.
+        Case 2: the node has no grandchild, swap the node with the larger child, and return.
+        Case 3: the node has grandchildren, if the node is smaller than the largest grandchild, swap both of
+        them. However, the node may be smaller than the parent of the largest grandchild, so check if the node
+        is smaller than the parent of the largest grandchild, if it is, swap the node with the parent of the
+        largest grandchild (maintain the min heap property), and recursively call popMaxHeapify with the index
+        of the largest grandchild to maintain the min-max heap property.
+        @return: the data of the max node
+        @side effect: extract the max node
+    */
     void _popMaxHeapify(int index) {
         int left = _getLeftChild(index);
         int right = _getRightChild(index);
@@ -608,6 +978,11 @@ class MinMaxHeap {
         }
     }
 
+    /*
+        Extract the min node.
+        @return: the data of the min node
+        @side effect: extract the min node
+    */
     T _pop_min() {
         T data = _heap[0].data;
         swap(_heap[0], _heap[_size - 1]);
@@ -618,6 +993,11 @@ class MinMaxHeap {
         return data;
     }
 
+    /*
+        Extract the max node.
+        @return: the data of the max node
+        @side effect: extract the max node
+    */
     T _pop_max() {
         if (_size == 0) return T();
         if (_size == 1) {
@@ -644,6 +1024,13 @@ class MinMaxHeap {
     ~MinMaxHeap() { _clear(); }
     void clear() { _clear(); }
     bool empty() const { return _size == 0; }
+
+    /*
+        Build the heap from the given array.
+        @param arr: the array to be built
+        @param cmp_key_arr: the array of the key to compare
+        @side effect: build the heap from the given array
+    */
     void setHeap(const vector<T> &arr, const vector<int> &cmp_key_arr) {
         _clear();
         for (int i = 0; i < arr.size(); i++) {
@@ -660,6 +1047,11 @@ class MinMaxHeap {
     int getHeight() { return _getHeight(); }
     T getLeftMost(int &index) { return _getLeftMost(index); }
     T getRightMost(int &index) { return _getRightMost(index); }
+
+    /*
+        Get the content of the heap.
+        @return: the heap
+    */
     vector<T> getHeap() {
         vector<T> ans;
         for (auto &node : _heap) {
@@ -706,6 +1098,29 @@ class Data {
         _filename.clear();
     }
 
+    bool isDigit(const string &str) {
+        for (char c : str) {
+            if (!isdigit(c)) return false;
+        }
+        return true;
+    }
+
+    /*
+        Convert string to integer.
+        To avoid the invalid conversion, the method will only convert the digits in the string.
+        "123abc456" -> "123456" -> 123456
+        "1,234,567" -> "1234567" -> 1234567
+        @param str: the string to be converted
+        @return: the integer converted from the string
+    */
+    int stoi(const string &str) {
+        string tmp;
+        for (char c : str) {
+            if (isdigit(c)) tmp += c;
+        }
+        return atoi(tmp.c_str());
+    }
+
     bool isEmpty() const { return _data_arr.empty(); }
     /*
         Read data from file
@@ -739,15 +1154,16 @@ class Data {
             vector<string> read_line_data_tmp;
             string line_tmp;
             while (getline(ss, line_tmp, '\t')) read_line_data_tmp.push_back(line_tmp); // split by tab
-            data.school_id = stoi(read_line_data_tmp[0]);
-            data.school_name = read_line_data_tmp[1];
-            data.department_id = stoi(read_line_data_tmp[2]);
-            data.department_name = read_line_data_tmp[3];
-            data.day_further = read_line_data_tmp[4];
-            data.level = read_line_data_tmp[5];
-            data.student_count = stoi(read_line_data_tmp[6]);
-            data.teacher_count = stoi(read_line_data_tmp[7]);
-            data.graduate_count = stoi(read_line_data_tmp[8]);
+            int len = read_line_data_tmp.size();
+            data.school_id = (len > 0) ? stoi(read_line_data_tmp[0]) : 0;
+            data.school_name = (len > 1) ? read_line_data_tmp[1] : "";
+            data.department_id = (len > 2) ? stoi(read_line_data_tmp[2]) : 0;
+            data.department_name = (len > 3) ? read_line_data_tmp[3] : "";
+            data.day_further = (len > 4) ? read_line_data_tmp[4] : "";
+            data.level = (len > 5) ? read_line_data_tmp[5] : "";
+            data.student_count = (len > 6) ? stoi(read_line_data_tmp[6]) : 0;
+            data.teacher_count = (len > 7) ? stoi(read_line_data_tmp[7]) : 0;
+            data.graduate_count = (len > 8) ? stoi(read_line_data_tmp[8]) : 0;
             _data_arr.push_back(data);
         }
 
@@ -755,6 +1171,10 @@ class Data {
         return 1;
     }
 
+    /*
+        Build the double-ended heap.
+        @side effect: build the double-ended heap
+    */
     void buildDeap() {
         int len = _data_arr.size();
         for (int i = 0; i < len; ++i) {
@@ -771,6 +1191,10 @@ class Data {
 #endif
     }
 
+    /*
+        Build the max heap.
+        @side effect: build the max heap
+    */
     void buildMaxHeap() {
         int len = _data_arr.size();
         for (int i = 0; i < len; ++i) {
@@ -789,6 +1213,10 @@ class Data {
 #endif
     }
 
+    /*
+        Build the min-max heap.
+        @side effect: build the min-max heap
+    */
     void buildMinMaxHeap() {
         int len = _data_arr.size();
         for (int i = 0; i < len; ++i) {
@@ -807,6 +1235,10 @@ class Data {
 #endif
     }
 
+    /*
+        Print the information of the max heap.
+        @side effect: print the information of the max heap
+    */
     void printMaxHeapInfo() {
         if (_maxheap_by_student_count.empty()) {
             return;
@@ -824,6 +1256,10 @@ class Data {
              << endl;
     }
 
+    /*
+        Print the information of the double-ended heap.
+        @side effect: print the information of the double-ended heap
+    */
     void printDeapInfo() {
         if (_deap_by_student_count.empty()) {
             return;
@@ -840,6 +1276,10 @@ class Data {
              << endl;
     }
 
+    /*
+        Print the information of the min-max heap.
+        @side effect: print the information of the min-max heap
+    */
     void printMinMaxHeapInfo() {
         if (_minmaxheap_by_graduate_count.empty()) {
             return;
@@ -857,6 +1297,9 @@ class Data {
              << endl;
     }
 
+    /*
+        This method has not been tested yet.
+    */
     void printDeapMinRemoved() {
         if (_deap_by_student_count.empty()) {
             cout << "The Dataset is empty" << endl;
@@ -874,6 +1317,9 @@ class Data {
         cout << endl;
     }
 
+    /*
+        This method has not been tested yet.
+    */
     void printDeapMaxRemoved() {
         if (_deap_by_student_count.empty()) {
             cout << "The Dataset is empty" << endl;
@@ -891,6 +1337,9 @@ class Data {
         cout << endl;
     }
 
+    /*
+        This method has not been tested yet.
+    */
     void printMinMaxHeapMinRemoved() {
         if (_minmaxheap_by_graduate_count.empty()) {
             cout << "The Dataset is empty" << endl;
@@ -914,6 +1363,9 @@ class Data {
         cout << endl;
     }
 
+    /*
+        This method has not been tested yet.
+    */
     void printMinMaxHeapMaxRemoved() {
         if (_minmaxheap_by_graduate_count.empty()) {
             cout << "The Dataset is empty" << endl;

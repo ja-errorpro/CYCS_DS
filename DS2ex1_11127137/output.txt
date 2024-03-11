@@ -1,0 +1,322 @@
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [1] 1
+bottom: [10] 1
+leftmost bottom: [8] 1
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [1] 1
+bottom: [11] 1
+leftmost bottom: [8] 1
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [19] 2
+bottom: [35] 2
+leftmost bottom: [16] 1
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [2] 48
+bottom: [3] 5
+leftmost bottom: [1] 2
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [21] 929
+bottom: [13] 189
+leftmost bottom: [8] 200
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [34] 929
+bottom: [46] 279
+leftmost bottom: [32] 124
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [30] 975
+bottom: [104] 0
+leftmost bottom: [16] 18
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [439] 511
+bottom: [2502] 34
+leftmost bottom: [256] 7
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [13] 929
+bottom: [8] 281
+leftmost bottom: [8] 281
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [23] 929
+bottom: [34] 279
+leftmost bottom: [16] 161
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [34] 929
+bottom: [46] 279
+leftmost bottom: [32] 124
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [439] 511
+bottom: [2502] 34
+leftmost bottom: [256] 7
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [9976] 3559
+bottom: [10072] 0
+leftmost bottom: [512] 13
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [5] 169
+bottom: [93] 12
+leftmost bottom: [32] 23
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <max heap>
+root: [5] 169
+bottom: [93] 12
+leftmost bottom: [32] 23
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [10] 1
+leftmost bottom: [7] 1
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [11] 1
+leftmost bottom: [7] 1
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [12] 1
+leftmost bottom: [11] 1
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [3] 5
+leftmost bottom: [3] 5
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [18] 485
+leftmost bottom: [23] 232
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [47] 344
+leftmost bottom: [23] 198
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [72] 45
+leftmost bottom: [63] 32
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [2503] 43
+leftmost bottom: [64] 32
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [11] 444
+leftmost bottom: [4] 475
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [12] 281
+leftmost bottom: [31] 248
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [47] 344
+leftmost bottom: [23] 198
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [2503] 43
+leftmost bottom: [64] 32
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [5036] 32
+leftmost bottom: [4096] 170
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [46] 23
+leftmost bottom: [63] 25
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): <DEAP>
+bottom: [46] 23
+leftmost bottom: [63] 25
+
+**** Heap Construction *****
+* 0. QUIT                  *
+* 1. Build a max heap      *
+* 2. Build a DEAP          *
+****************************
+Input a choice(0, 1, 2): 
