@@ -1389,6 +1389,28 @@ class Data {
         cout << endl;
     }
 
+    void RemoveDeapMax() {
+        cout << "\nEnter the value of K in [1," << _deap_by_student_count.size() << "]: ";
+        int k;
+        cin >> k;
+        cin.ignore();
+        if (k < 1 || k > 16) {
+            cout << "Invalid input" << endl;
+            return;
+        }
+        for (int i = 1; i <= k; i++) {
+            if (_deap_by_student_count.empty()) {
+                cout << "The Dataset is empty" << endl;
+                return;
+            }
+            int removed = _deap_by_student_count.pop_max();
+            cout << "Top\t" << i << ": ";
+            cout << "[" << removed + 1 << "] " << _data_arr[removed].school_name << ", "
+                 << _data_arr[removed].day_further << ", " << _data_arr[removed].level << ", "
+                 << _data_arr[removed].student_count << endl;
+        }
+    }
+
 }; // class Data
 
 class Solution {
@@ -1418,6 +1440,7 @@ class Solution {
         }
     }
     void case3() {
+        /*
         _ds.reset();
         int state = _ds.read();
         while (state < 1) {
@@ -1426,7 +1449,13 @@ class Solution {
         if (state == 1) {
             _ds.buildMinMaxHeap();
             _ds.printMinMaxHeapInfo();
+        }*/
+        if (_ds.isEmpty()) {
+            cout << "Please read the data first" << endl;
+            return;
         }
+
+        _ds.RemoveDeapMax();
     }
 
     void case4() {
@@ -1467,17 +1496,17 @@ class Solution {
 };
 
 void WriteMenu() {
-    cout << "\n**** Heap Construction *****\n"
-            "* 0. QUIT                  *\n"
-            "* 1. Build a max heap      *\n"
-            "* 2. Build a DEAP          *\n"
-            //"* 3. Build a minMax heap          *\n"
+    cout << "\n**** Heap Construction ********\n"
+            "* 0. QUIT                     *\n"
+            "* 1. Build a max heap         *\n"
+            "* 2. Build a DEAP             *\n"
+            "* 3. Top-K maximums from DEAP *\n"
             //"* 4. remove min from a deap       *\n"
             //"* 5. remove max from a deap       *\n"
             //"* 6. remove min from a minMaxheap *\n"
             //"* 7. remove max from a minMaxheap *\n"
-            "****************************\n"
-            "Input a choice(0, 1, 2): ";
+            "*******************************\n"
+            "Input a choice(0, 1, 2, 3): ";
 }
 
 signed main() {
