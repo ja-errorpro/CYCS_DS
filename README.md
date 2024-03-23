@@ -1,5 +1,9 @@
 # 中原資工 Data Structure and Algorithms in C++ 作業檔案
 
+```
+聲明：
+此 Repository 僅用於存放作業紀錄，可用於參考，直接 Copy Paste 後果自負。
+```
 
 包含上機程式碼與流程圖
 
