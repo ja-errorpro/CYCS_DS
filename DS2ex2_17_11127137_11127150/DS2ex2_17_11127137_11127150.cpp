@@ -7,6 +7,7 @@
 /*  Compiler: g++ 9.4                               */
 /****************************************************/
 
+#include <algorithm>
 #include <cctype>
 #include <cmath>
 #include <cstdio>
@@ -38,7 +39,203 @@ void VERBOSE(rest... args) {
 }
 
 template <class T>
-class two3Tree {};
+struct slotData {
+    vector<T> data;
+    int key;
+};
+
+template <class T>
+class two3Tree {
+    struct Node {
+        vector<slotData<T> > data; // pair<data, key>
+        vector<Node *> children;
+        Node *parent;
+        Node() : parent(nullptr) {}
+        Node(T data) : data(data), parent(nullptr) {}
+
+        void insertCurrentNode(slotData<T> insert_data) {
+            data.push_back(insert_data);
+            sort(data.begin(), data.end(), [](slotData<T> a, slotData<T> b) { return a.key < b.key; });
+            // merge
+            for (int i = 0; i < data.size() - 1; i++) {
+                if (data[i].key == data[i + 1].key) {
+                    data[i].data.insert(data[i].data.end(), data[i + 1].data.begin(), data[i + 1].data.end());
+                    data.erase(data.begin() + i + 1);
+                }
+            }
+        }
+
+        void insertChildNode(Node *child) {
+            children.push_back(child);
+            sort(children.begin(), children.end(),
+                 [](Node *a, Node *b) { return a->data[0].key < b->data[0].key; });
+
+            for (int i = 0; i < children.size() - 1; i++) {
+                if (children[i]->data[0].key == children[i + 1]->data[0].key) {
+                    children[i]->data.insert(children[i]->data.end(), children[i + 1]->data.begin(),
+                                             children[i + 1]->data.end());
+                    children.erase(children.begin() + i + 1);
+                }
+            }
+        }
+
+        void popCurrentNode(T pop_data) {
+            for (int i = 0; i < data.size(); i++) {
+                if (data[i].first == pop_data) {
+                    data.erase(data.begin() + i);
+                    break;
+                }
+            }
+        }
+
+        void popChildNode(Node *child) {
+            for (int i = 0; i < children.size(); i++) {
+                if (children[i] == child) {
+                    children.erase(children.begin() + i);
+                    break;
+                }
+            }
+        }
+
+        void pullUp() {
+            Node *left = new Node();
+            Node *right = new Node();
+            left->data.push_back(data[0]);
+            right->data.push_back(data[2]);
+            if (!children.empty()) {
+                left->insertChildNode(children[0]);
+                left->insertChildNode(children[1]);
+                right->insertChildNode(children[2]);
+                right->insertChildNode(children[3]);
+                children[0]->parent = left;
+                children[1]->parent = left;
+                children[2]->parent = right;
+                children[3]->parent = right;
+            }
+
+            if (parent == nullptr) {
+                parent = new Node();
+                parent->insertChildNode(this);
+            }
+            parent->insertCurrentNode(data[1]);
+            parent->popChildNode(this);
+            parent->insertChildNode(left);
+            parent->insertChildNode(right);
+            left->parent = parent;
+            right->parent = parent;
+        }
+    };
+
+    Node *root;
+
+    void _clear(Node *&node) {
+        if (node == nullptr) return;
+        for (Node *child : node->children) _clear(child);
+        delete node;
+        node = nullptr;
+    }
+
+    void _insert(slotData<T> data, Node *node) {
+        for (int i = 0; i < node->data.size(); i++) {
+            if (data.key == node->data[i].key) {
+                node->data[i].data.insert(node->data[i].data.end(), data.data.begin(), data.data.end());
+                return;
+            }
+        }
+        if (node->children.empty()) {
+            node->insertCurrentNode(data);
+            while (node != nullptr && node->data.size() == 3) {
+                node->pullUp();
+                Node *tmp = node;
+                node = node->parent;
+                delete tmp;
+            }
+            if (node->parent == nullptr) root = node;
+            return;
+        }
+        for (int i = 0; i < node->data.size(); i++) {
+            if (data.key < node->data[i].key) {
+                _insert(data, node->children[i]);
+                return;
+            }
+        }
+        _insert(data, node->children.back());
+    }
+
+    int _getHeight(Node *node) {
+        if (node == nullptr) return 0;
+        int height = 1;
+        for (Node *child : node->children) height = max(height, _getHeight(child) + 1);
+        return height;
+    }
+
+    int _size(Node *node) { // count of nodes
+        if (node == nullptr) return 0;
+        int size = 1;
+        for (Node *child : node->children) size += _size(child);
+        return size;
+    }
+
+    Node *_query(int key, Node *node) {
+        if (node == nullptr) return nullptr;
+        for (int i = 0; i < node->data.size(); i++) {
+            if (key == node->data[i].key) return node;
+            if (key < node->data[i].key) return _query(key, node->children[i]);
+        }
+        return _query(key, node->children.back());
+    }
+
+   public:
+    two3Tree() : root(nullptr) {}
+    ~two3Tree() { _clear(root); }
+    void insert(int key, T data) {
+        slotData<T> insert_data;
+        insert_data.key = key;
+        insert_data.data.push_back(data);
+        if (root == nullptr) {
+            root = new Node();
+            root->insertCurrentNode(insert_data);
+            return;
+        }
+        _insert(insert_data, root);
+    }
+
+    int getHeight() { return _getHeight(root); }
+    int size() { return _size(root); }
+    void clear() { _clear(root); }
+
+    vector<T> query(int key) {
+        Node *node = _query(key, root);
+        if (node == nullptr) return {};
+        for (slotData<T> data : node->data) {
+            if (data.key == key) return data.data;
+        }
+        return {};
+    }
+
+    vector<T> queryRoot() {
+        vector<T> res;
+        for (slotData<T> data : root->data) {
+            res.insert(res.end(), data.data.begin(), data.data.end());
+        }
+        return res;
+    }
+
+    void test_printAll() {
+        if (root == nullptr) return;
+        deque<Node *> q;
+        q.push_back(root);
+        while (!q.empty()) {
+            Node *node = q.front();
+            q.pop_front();
+            for (slotData<T> data : node->data) {
+                cout << data.key << " ";
+            }
+            cout << endl;
+            for (Node *child : node->children) q.push_back(child);
+        }
+    }
+};
 
 template <class T>
 class AVL {};
@@ -57,9 +254,14 @@ class Data {
     };
     vector<_data> _data_arr;
 
+    two3Tree<int> _btree_by_graduate;
+
     string _filename;
 
-    void _clear() { _data_arr.clear(); }
+    void _clear() {
+        _data_arr.clear();
+        _btree_by_graduate.clear();
+    }
 
    public:
     Data() {}
@@ -142,6 +344,32 @@ class Data {
         return 1;
     }
 
+    void build23Tree() {
+        for (int i = 0; i < _data_arr.size(); i++) {
+            _btree_by_graduate.insert(_data_arr[i].graduate_count, i);
+            _btree_by_graduate.test_printAll();
+            cout << endl;
+        }
+    }
+
+    void buildAVL() {}
+
+    void print23TreeInfo() {
+        _btree_by_graduate.test_printAll();
+        cout << endl;
+        cout << "Height: " << _btree_by_graduate.getHeight() << endl;
+        cout << "Size: " << _btree_by_graduate.size() << endl;
+        cout << "Root Data: \n";
+        vector<int> root_data = _btree_by_graduate.queryRoot();
+        for (int i = 0; i < root_data.size(); i++) {
+            cout << i + 1 << "[" << root_data[i] + 1 << "]" << _data_arr[root_data[i]].school_name << ", "
+                 << _data_arr[root_data[i]].department_name << " " << _data_arr[root_data[i]].day_further
+                 << " " << _data_arr[root_data[i]].level << " " << _data_arr[root_data[i]].student_count
+                 << " " << _data_arr[root_data[i]].graduate_count << endl;
+        }
+        cout << endl;
+    }
+
 }; // class Data
 
 class Solution {
@@ -155,6 +383,8 @@ class Solution {
             state = _ds.read();
         }
         if (state == 1) {
+            _ds.build23Tree();
+            _ds.print23TreeInfo();
         }
     }
     void case2() {
