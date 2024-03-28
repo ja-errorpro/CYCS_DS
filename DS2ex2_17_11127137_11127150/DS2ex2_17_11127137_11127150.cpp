@@ -1,4 +1,4 @@
-// 11127137 ¶À¤A®a, 11127150 ±iºÍ®¦
+// 11127137 ï¿½ï¿½ï¿½Aï¿½a, 11127150 ï¿½iï¿½Í®ï¿½
 /****************************************************/
 /*  CPP Template for School                         */
 /*  Author: CompileErr0r(YiJia)                     */
@@ -238,7 +238,126 @@ class two3Tree {
 };
 
 template <class T>
-class AVL {};
+class AVL {
+    struct Node {
+        slotData<T> data;
+        Node *left;
+        Node *right;
+        Node *parent;
+        int height;
+        Node() : left(nullptr), right(nullptr), parent(nullptr), height(1) {}
+        Node(slotData<T> data) : data(data), left(nullptr), right(nullptr), parent(nullptr), height(1) {}
+
+        void update() { height = max(_getHeight(left), _getHeight(right)) + 1; }
+
+        int BalancedFactor() { return _getHeight(left) - _getHeight(right); }
+
+        Node *rotateLeft() {
+            Node *new_root = right;
+            right = new_root->left;
+            new_root->left = this;
+            update();
+            new_root->update();
+            return new_root;
+        }
+
+        Node *rotateRight() {
+            Node *new_root = left;
+            left = new_root->right;
+            new_root->right = this;
+            update();
+            new_root->update();
+            return new_root;
+        }
+
+        int _getHeight(Node *node) {
+            if (node == nullptr) return 0;
+            int left_height = _getHeight(node->left);
+            int right_height = _getHeight(node->right);
+            return max(left_height, right_height) + 1;
+        }
+    };
+    Node *root;
+
+    void _clear(Node *&node) {
+        if (node == nullptr) return;
+        _clear(node->left);
+        _clear(node->right);
+        delete node;
+        node = nullptr;
+    }
+
+    void _balance(Node *&node) {
+        node->update();
+        if (node->BalancedFactor() == 2) {
+            if (node->left->BalancedFactor() < 0) node->left = node->left->rotateLeft();
+            node = node->rotateRight();
+        } else if (node->BalancedFactor() == -2) {
+            if (node->right->BalancedFactor() > 0) node->right = node->right->rotateRight();
+            node = node->rotateLeft();
+        }
+    }
+
+    void _insert(slotData<T> data, Node *&node) {
+        if (node == nullptr) {
+            node = new Node(data);
+            return;
+        }
+        if (data.key == node->data.key) {
+            node->data.data.insert(node->data.data.end(), data.data.begin(), data.data.end());
+            return;
+        }
+        if (data.key < node->data.key) {
+            _insert(data, node->left);
+        } else {
+            _insert(data, node->right);
+        }
+        _balance(node);
+    }
+
+    int _getHeight(Node *node) {
+        if (node == nullptr) return 0;
+        return node->height;
+    }
+
+    int _size(Node *node) { // count of nodes
+        if (node == nullptr) return 0;
+        return 1 + _size(node->left) + _size(node->right);
+    }
+
+    Node *_query(int key, Node *node) {
+        if (node == nullptr) return nullptr;
+        if (key == node->data.key) return node;
+        if (key < node->data.key) return _query(key, node->left);
+        return _query(key, node->right);
+    }
+
+   public:
+    AVL() : root(nullptr) {}
+    ~AVL() { _clear(root); }
+    void insert(int key, T data) {
+        slotData<T> insert_data;
+        insert_data.key = key;
+        insert_data.data.push_back(data);
+        if (root == nullptr) {
+            root = new Node(insert_data);
+            return;
+        }
+        _insert(insert_data, root);
+    }
+
+    int getHeight() { return _getHeight(root); }
+    int size() { return _size(root); }
+    void clear() { _clear(root); }
+
+    vector<T> query(int key) {
+        Node *node = _query(key, root);
+        if (node == nullptr) return {};
+        return node->data.data;
+    }
+
+    vector<T> queryRoot() { return root->data.data; }
+};
 
 class Data {
     struct _data {
@@ -255,12 +374,14 @@ class Data {
     vector<_data> _data_arr;
 
     two3Tree<int> _btree_by_graduate;
+    AVL<int> _avl_by_student;
 
     string _filename;
 
     void _clear() {
         _data_arr.clear();
         _btree_by_graduate.clear();
+        _avl_by_student.clear();
     }
 
    public:
@@ -294,7 +415,8 @@ class Data {
         return atoi(tmp.c_str());
     }
 
-    bool isEmpty() const { return _data_arr.empty(); }
+    bool isEmpty() { return _data_arr.empty(); }
+    bool isAVLEmpty() { return _avl_by_student.size() == 0; }
     /*
         Read data from file
         @return: 1 for success, 2 for quit, -1 for fail
@@ -347,25 +469,39 @@ class Data {
     void build23Tree() {
         for (int i = 0; i < _data_arr.size(); i++) {
             _btree_by_graduate.insert(_data_arr[i].graduate_count, i);
-            _btree_by_graduate.test_printAll();
-            cout << endl;
         }
     }
 
-    void buildAVL() {}
+    void buildAVL() {
+        for (int i = 0; i < _data_arr.size(); i++) {
+            _avl_by_student.insert(_data_arr[i].student_count, i);
+        }
+    }
 
     void print23TreeInfo() {
-        _btree_by_graduate.test_printAll();
-        cout << endl;
-        cout << "Height: " << _btree_by_graduate.getHeight() << endl;
-        cout << "Size: " << _btree_by_graduate.size() << endl;
-        cout << "Root Data: \n";
+        cout << "Tree height = " << _btree_by_graduate.getHeight() << endl;
+        cout << "Number of nodes = " << _btree_by_graduate.size() << endl;
+
         vector<int> root_data = _btree_by_graduate.queryRoot();
         for (int i = 0; i < root_data.size(); i++) {
-            cout << i + 1 << "[" << root_data[i] + 1 << "]" << _data_arr[root_data[i]].school_name << ", "
-                 << _data_arr[root_data[i]].department_name << " " << _data_arr[root_data[i]].day_further
-                 << " " << _data_arr[root_data[i]].level << " " << _data_arr[root_data[i]].student_count
-                 << " " << _data_arr[root_data[i]].graduate_count << endl;
+            cout << i + 1 << ": [" << root_data[i] + 1 << "] " << _data_arr[root_data[i]].school_name << ", "
+                 << _data_arr[root_data[i]].department_name << ", " << _data_arr[root_data[i]].day_further
+                 << ", " << _data_arr[root_data[i]].level << ", " << _data_arr[root_data[i]].student_count
+                 << ", " << _data_arr[root_data[i]].graduate_count << endl;
+        }
+        cout << endl;
+    }
+
+    void printAVLTreeInfo() {
+        cout << "Tree height = " << _avl_by_student.getHeight() << endl;
+        cout << "Number of nodes = " << _avl_by_student.size() << endl;
+
+        vector<int> root_data = _avl_by_student.queryRoot();
+        for (int i = 0; i < root_data.size(); i++) {
+            cout << i + 1 << ": [" << root_data[i] + 1 << "] " << _data_arr[root_data[i]].school_name << ", "
+                 << _data_arr[root_data[i]].department_name << ", " << _data_arr[root_data[i]].day_further
+                 << ", " << _data_arr[root_data[i]].level << ", " << _data_arr[root_data[i]].student_count
+                 << ", " << _data_arr[root_data[i]].graduate_count << endl;
         }
         cout << endl;
     }
@@ -388,18 +524,19 @@ class Solution {
         }
     }
     void case2() {
-        _ds.reset();
-        int state = _ds.read();
-        while (state < 1) {
-            state = _ds.read();
+        if (_ds.isEmpty()) {
+            cout << "### Choose 1 first. ###" << endl;
+            return;
         }
-        if (state == 1) {
+        if (_ds.isAVLEmpty()) {
+            _ds.buildAVL();
         }
+        _ds.printAVLTreeInfo();
     }
 };
 
 void WriteMenu() {
-    cout << "**** Balanced Search Trees ****\n"
+    cout << "\n**** Balanced Search Trees ****\n"
             "* 0. QUIT                     *\n"
             "* 1. Build 23 tree            *\n"
             "* 2. Build AVL tree           *\n"

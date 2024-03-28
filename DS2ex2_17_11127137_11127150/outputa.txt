@@ -1,0 +1,422 @@
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 3
+Number of nodes = 8
+1: [6] 國立中央大學, 資訊工程學系, D 日, B 學士, 1, 15
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 2
+Number of nodes = 2
+1: [1] 國立清華大學, 資訊工程學系, D 日, B 學士, 1047, 2
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 3
+Number of nodes = 8
+1: [6] 國立中央大學, 資訊工程學系, D 日, B 學士, 1, 15
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 1
+Number of nodes = 1
+1: [1] 國立清華大學, 資訊工程學系, D 日, B 學士, 1, 2
+2: [2] 國立臺灣大學, 資訊工程學系, D 日, B 學士, 1, 60
+3: [3] 國立成功大學, 資訊工程學系, D 日, B 學士, 1, 50
+4: [4] 國立中興大學, 資訊科學與工程學系, D 日, B 學士, 1, 10
+5: [5] 國立交通大學, 資訊工程學系, D 日, B 學士, 1, 8
+6: [6] 國立中央大學, 資訊工程學系, D 日, B 學士, 1, 15
+7: [7] 國立中山大學, 資訊工程學系, D 日, B 學士, 1, 20
+8: [8] 國立中正大學, 資訊工程學系, D 日, B 學士, 1, 45
+9: [9] 國立臺北大學, 資訊工程學系, D 日, B 學士, 1, 55
+10: [10] 國立嘉義大學, 資訊工程學系, D 日, B 學士, 1, 30
+11: [11] 國立高雄大學, 資訊工程學系, D 日, B 學士, 1, 38
+12: [12] 國立高雄大學, 資訊工程學系, D 日, B 學士, 1, 38
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 4
+Number of nodes = 21
+1: [3] 國立成功大學, 資訊工程學系, D 日, B 學士, 1, 85
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 2
+Number of nodes = 2
+1: [1] 國立清華大學, 資訊工程學系, D 日, B 學士, 1, 117
+2: [2] 國立臺灣大學, 資訊工程學系, D 日, B 學士, 1, 104
+3: [3] 國立成功大學, 資訊工程學系, D 日, B 學士, 1, 85
+4: [4] 國立中興大學, 資訊科學與工程學系, D 日, B 學士, 1, 45
+5: [5] 國立交通大學, 資訊工程學系, D 日, B 學士, 1, 187
+6: [6] 國立中央大學, 資訊工程學系, D 日, B 學士, 1, 109
+7: [7] 國立中山大學, 資訊工程學系, D 日, B 學士, 1, 44
+8: [8] 國立中正大學, 資訊工程學系, D 日, B 學士, 1, 90
+9: [9] 國立臺北大學, 資訊工程學系, D 日, B 學士, 1, 39
+10: [10] 國立嘉義大學, 資訊工程學系, D 日, B 學士, 1, 40
+11: [11] 國立高雄大學, 資訊工程學系, D 日, B 學士, 1, 37
+12: [12] 國立東華大學, 資訊工程學系, D 日, B 學士, 1, 51
+13: [13] 國立臺東大學, 資訊工程學系, D 日, B 學士, 1, 86
+14: [14] 國立宜蘭大學, 資訊工程學系, D 日, B 學士, 1, 37
+15: [15] 國立聯合大學, 資訊工程學系, D 日, B 學士, 1, 40
+16: [16] 國立臺南大學, 資訊工程學系, D 日, B 學士, 1, 39
+17: [17] 國立金門大學, 資訊工程學系, D 日, B 學士, 1, 44
+18: [18] 國立屏東大學, 資訊工程學系, D 日, B 學士, 1, 49
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 2
+Number of nodes = 3
+1: [2] 國立臺灣大學, 資訊工程學系, D 日, B 學士, 48, 104
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 2
+Number of nodes = 3
+1: [3] 國立成功大學, 資訊工程學系, D 日, B 學士, 5, 85
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 4
+Number of nodes = 18
+1: [2] 國立臺灣大學, 資訊工程學系, D 日, B 學士, 520, 104
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 6
+Number of nodes = 26
+1: [6] 國立中山大學, 資訊工程學系, D 日, B 學士, 234, 44
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 4
+Number of nodes = 29
+1: [26] 國立屏東大學, 資訊工程學系, D 日, B 學士, 229, 49
+2: [2] 國立臺灣大學, 資訊工程學系, D 日, B 學士, 520, 104
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 6
+Number of nodes = 44
+1: [8] 國立中山大學, 資訊工程學系, D 日, B 學士, 234, 44
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 5
+Number of nodes = 43
+1: [2] 中原大學, 教育學系, N 職, M 碩士, 97, 26
+2: [78] 中原大學, 土木工程學系, D 日, M 碩士, 41, 26
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 8
+Number of nodes = 75
+1: [4] 中原大學, 特殊教育學系, D 日, B 學士, 223, 49
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 6
+Number of nodes = 80
+1: [40] 國立政治大學, 會計(與)(資訊)(科技)(系統)學系, D 日, M 碩士, 141, 63
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 9
+Number of nodes = 217
+1: [40] 國立政治大學, 會計(與)(資訊)(科技)(系統)學系, D 日, M 碩士, 141, 63
+2: [80] 國立清華大學, 物理學系, D 日, M 碩士, 141, 47
+3: [374] 國立中興大學, 化學系, D 日, M 碩士, 141, 73
+4: [867] 國立臺灣科技大學, 資訊管理(技術)學系, D 日, M 碩士, 141, 64
+5: [1153] 國立臺南大學, 教育學系, D 日, M 碩士, 141, 30
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 3
+Number of nodes = 11
+1: [2] 國立臺灣大學, 資訊工程學系, D 日, B 學士, 520, 104
+2: [15] 元智大學, 資訊工程學系, D 日, B 學士, 630, 142
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 5
+Number of nodes = 16
+1: [4] 國立中央大學, 資訊工程學系, D 日, B 學士, 475, 109
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 4
+Number of nodes = 21
+1: [3] 國立成功大學, 資訊工程學系, D 日, B 學士, 461, 85
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 6
+Number of nodes = 34
+1: [7] 國立中山大學, 資訊工程學系, D 日, B 學士, 234, 44
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 4
+Number of nodes = 29
+1: [26] 國立屏東大學, 資訊工程學系, D 日, B 學士, 229, 49
+2: [2] 國立臺灣大學, 資訊工程學系, D 日, B 學士, 520, 104
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 6
+Number of nodes = 44
+1: [8] 國立中山大學, 資訊工程學系, D 日, B 學士, 234, 44
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 6
+Number of nodes = 80
+1: [40] 國立政治大學, 會計(與)(資訊)(科技)(系統)學系, D 日, M 碩士, 141, 63
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 9
+Number of nodes = 217
+1: [40] 國立政治大學, 會計(與)(資訊)(科技)(系統)學系, D 日, M 碩士, 141, 63
+2: [80] 國立清華大學, 物理學系, D 日, M 碩士, 141, 47
+3: [374] 國立中興大學, 化學系, D 日, M 碩士, 141, 73
+4: [867] 國立臺灣科技大學, 資訊管理(技術)學系, D 日, M 碩士, 141, 64
+5: [1153] 國立臺南大學, 教育學系, D 日, M 碩士, 141, 30
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 7
+Number of nodes = 178
+1: [109] 國立政治大學, 企業管理學系, D 日, B 學士, 448, 98
+2: [855] 國立成功大學, 化學工程學系, D 日, M 碩士, 232, 98
+3: [1197] 國立交通大學, (動力)機械工程學系, D 日, M 碩士, 276, 98
+4: [1317] 國立中央大學, 電機(與控制)工程學系, D 日, M 碩士, 289, 98
+5: [1340] 國立中央大學, 土木工程學系, D 日, B 學士, 394, 98
+6: [2715] 國立臺北科技大學, (微)電子(工程)學系, D 日, B 四技, 399, 98
+7: [4183] 東海大學, (中)國(語)文學系, D 日, B 學士, 481, 98
+8: [4525] 中原大學, 應用外國語文學系, D 日, B 學士, 415, 98
+9: [4794] 中國文化大學, 日本語文學系, D 日, B 學士, 505, 98
+10: [4967] 逢甲大學, 統計(科學)(資訊)學系, D 日, B 學士, 432, 98
+11: [5088] 靜宜大學, 資訊工程學系, D 日, B 學士, 439, 98
+12: [5295] 大葉大學, 造形藝術學系, D 日, B 學士, 468, 98
+13: [6752] 輔英科技大學, 資訊管理(技術)學系, D 日, B 四技, 354, 98
+14: [6789] 明新科技大學, 應用外語系, D 日, B 四技, 403, 98
+15: [6805] 明新科技大學, 資訊管理(技術)學系, D 日, B 四技, 431, 98
+16: [6980] 弘光科技大學, 老人福利與事業系, D 日, B 四技, 363, 98
+17: [6985] 弘光科技大學, 餐旅(行銷)(暨遊憩)管理學系, N 修, B 四技, 471, 98
+18: [7864] 開南大學, 資訊傳播(工程)(設計)學系, D 日, B 學士, 307, 98
+19: [8263] 東南科技大學, 資訊管理(技術)學系, D 日, B 四技, 215, 98
+20: [8756] 台灣首府大學, 休閒(事業)管理學系, D 日, B 學士, 247, 98
+21: [8925] 大華科技大學, 電機與電子工程科, N 修, 2 二專, 86, 98
+22: [9063] 文藻外語大學, 德國語文學系, D 日, B 四技, 470, 98
+23: [9356] 亞東技術學院, 行銷(與)流通管理系, D 日, B 四技, 374, 98
+24: [9369] 亞東技術學院, (光電與)通訊(工程)學系, D 日, B 四技, 392, 98
+25: [9530] 德霖技術學院, 休閒(事業)管理學系, D 日, B 四技, 410, 98
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 12
+Number of nodes = 754
+1: [3] 國立政治大學, 教育學系, D 日, B 學士, 258, 47
+2: [297] 國立臺灣大學, (歷)史學系, D 日, B 學士, 258, 59
+3: [2446] 國立臺灣科技大學, 營建工程學系, D 日, M 碩士, 258, 101
+4: [2466] 國立臺灣科技大學, 建築(工程)學系, D 日, B 四技, 258, 58
+5: [4042] 國立臺北商業大學, 資訊管理科, D 日, 5 五專, 258, 36
+6: [4339] 輔仁大學, 社會學系, D 日, B 學士, 258, 65
+7: [5411] 華梵大學, 外國語文學系, D 日, B 學士, 258, 76
+8: [6506] 樹德科技大學, 休閒遊憩與運動管理系, D 日, B 四技, 258, 46
+9: [7839] 亞洲大學, 護理學系, D 日, B 學士, 258, 0
+10: [8612] 美和科技大學, 食品營養(科學)系, D 日, B 四技, 258, 44
+11: [9065] 文藻外語大學, 德國語文科, D 日, 5 五專, 258, 42
+12: [9900] 樹人醫護管理專科學校, (嬰)幼兒保育科, D 日, 5 五專, 258, 39
+13: [9989] 臺北市立大學, 教育學系, D 日, B 學士, 258, 55
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 4
+Number of nodes = 25
+1: [10] 輔仁大學, (社會政策與)社會工作學系, D 日, M 碩士, 67, 12
+2: [30] 中國文化大學, 體育學系, D 日, M 碩士, 120, 12
+3: [63] 中華大學, (動力)機械工程學系, D 日, M 碩士, 25, 12
+4: [80] 世新大學, 傳播管理學系, D 日, M 碩士, 21, 12
+5: [82] 銘傳大學, 會計(與)(資訊)(科技)(系統)學系, D 日, M 碩士, 23, 12
+6: [92] 高雄醫學大學, 醫務管理暨醫療資訊學系, D 日, M 碩士, 25, 12
+7: [5] 東海大學, 法律學系, D 日, M 碩士, 169, 21
+8: [7] 東海大學, 建築(工程)學系, D 日, M 碩士, 57, 21
+9: [43] 逢甲大學, 環境工程與科學學系, D 日, M 碩士, 50, 21
+10: [84] 銘傳大學, 國際企業(與)(管理)學系, D 日, M 碩士, 56, 21
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 7
+Number of nodes = 51
+1: [3] 國立屏東大學, 資訊科學學系, D 日, M 碩士, 47, 17
+2: [15] 東吳大學, 日本語文學系, D 日, M 碩士, 47, 11
+3: [24] 淡江大學, 企業管理學系, D 日, M 碩士, 47, 22
+4: [28] 淡江大學, 建築(工程)學系, D 日, M 碩士, 47, 17
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
+Input a file number ([0] Quit): Tree height = 4
+Number of nodes = 25
+1: [10] 輔仁大學, (社會政策與)社會工作學系, D 日, M 碩士, 67, 12
+2: [30] 中國文化大學, 體育學系, D 日, M 碩士, 120, 12
+3: [63] 中華大學, (動力)機械工程學系, D 日, M 碩士, 25, 12
+4: [80] 世新大學, 傳播管理學系, D 日, M 碩士, 21, 12
+5: [82] 銘傳大學, 會計(與)(資訊)(科技)(系統)學系, D 日, M 碩士, 23, 12
+6: [92] 高雄醫學大學, 醫務管理暨醫療資訊學系, D 日, M 碩士, 25, 12
+7: [5] 東海大學, 法律學系, D 日, M 碩士, 169, 21
+8: [7] 東海大學, 建築(工程)學系, D 日, M 碩士, 57, 21
+9: [43] 逢甲大學, 環境工程與科學學系, D 日, M 碩士, 50, 21
+10: [84] 銘傳大學, 國際企業(與)(管理)學系, D 日, M 碩士, 56, 21
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): Tree height = 7
+Number of nodes = 51
+1: [3] 國立屏東大學, 資訊科學學系, D 日, M 碩士, 47, 17
+2: [15] 東吳大學, 日本語文學系, D 日, M 碩士, 47, 11
+3: [24] 淡江大學, 企業管理學系, D 日, M 碩士, 47, 22
+4: [28] 淡江大學, 建築(工程)學系, D 日, M 碩士, 47, 17
+
+
+**** Balanced Search Trees ****
+* 0. QUIT                     *
+* 1. Build 23 tree            *
+* 2. Build AVL tree           *
+*******************************
+Input a choice(0, 1, 2): 
