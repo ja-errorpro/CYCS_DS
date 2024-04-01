@@ -1,4 +1,4 @@
-// 11127137 ¶À¤A®a, 11127150 ±iºÍ®¦
+// 11127137 ï¿½ï¿½ï¿½Aï¿½a, 11127150 ï¿½iï¿½Í®ï¿½
 /****************************************************/
 /*  CPP Template for School                         */
 /*  Author: CompileErr0r(YiJia)                     */
@@ -53,11 +53,16 @@ class two3Tree {
         Node() : parent(nullptr) {}
         Node(T data) : data(data), parent(nullptr) {}
 
+        /*
+            Insert data into current node.
+            If the key is already in the node, merge the data.
+            @param insert_data: the data to be inserted
+        */
         void insertCurrentNode(slotData<T> insert_data) {
             data.push_back(insert_data);
             sort(data.begin(), data.end(), [](slotData<T> a, slotData<T> b) { return a.key < b.key; });
             // merge
-            for (int i = 0; i < data.size() - 1; i++) {
+            for (int i = 0; i < (int)data.size() - 1; i++) {
                 if (data[i].key == data[i + 1].key) {
                     data[i].data.insert(data[i].data.end(), data[i + 1].data.begin(), data[i + 1].data.end());
                     data.erase(data.begin() + i + 1);
@@ -65,12 +70,18 @@ class two3Tree {
             }
         }
 
+        /*
+            Insert child node into current node.
+            Sort the children by key.
+            If the key of two children are the same, merge the data.
+            @param child: the child node to be inserted
+        */
         void insertChildNode(Node *child) {
             children.push_back(child);
             sort(children.begin(), children.end(),
                  [](Node *a, Node *b) { return a->data[0].key < b->data[0].key; });
 
-            for (int i = 0; i < children.size() - 1; i++) {
+            for (int i = 0; i < (int)children.size() - 1; i++) {
                 if (children[i]->data[0].key == children[i + 1]->data[0].key) {
                     children[i]->data.insert(children[i]->data.end(), children[i + 1]->data.begin(),
                                              children[i + 1]->data.end());
@@ -79,17 +90,25 @@ class two3Tree {
             }
         }
 
-        void popCurrentNode(T pop_data) {
-            for (int i = 0; i < data.size(); i++) {
-                if (data[i].first == pop_data) {
+        /*
+            Pop the data with the key from the current node.
+            @param pop_data: the key to be popped
+        */
+        void popCurrentNode(int pop_data) {
+            for (int i = 0; i < (int)data.size(); i++) {
+                if (data[i].key == pop_data) {
                     data.erase(data.begin() + i);
                     break;
                 }
             }
         }
 
+        /*
+            Pop the child node from the current node.
+            @param child: the child node to be popped
+        */
         void popChildNode(Node *child) {
-            for (int i = 0; i < children.size(); i++) {
+            for (int i = 0; i < (int)children.size(); i++) {
                 if (children[i] == child) {
                     children.erase(children.begin() + i);
                     break;
@@ -97,6 +116,10 @@ class two3Tree {
             }
         }
 
+        /*
+            Pull up the middle key to the parent node.
+            If the parent node is nullptr, create a new parent node.
+        */
         void pullUp() {
             Node *left = new Node();
             Node *right = new Node();
@@ -128,6 +151,10 @@ class two3Tree {
 
     Node *root;
 
+    /*
+        Clear the tree.
+        @param node: the node to be cleared
+    */
     void _clear(Node *&node) {
         if (node == nullptr) return;
         for (Node *child : node->children) _clear(child);
@@ -135,8 +162,14 @@ class two3Tree {
         node = nullptr;
     }
 
+    /*
+        Insert data into the tree.
+        If the key is already in the tree, merge the data.
+        @param data: the data to be inserted
+        @param node: the node to be inserted
+    */
     void _insert(slotData<T> data, Node *node) {
-        for (int i = 0; i < node->data.size(); i++) {
+        for (int i = 0; i < (int)node->data.size(); i++) {
             if (data.key == node->data[i].key) {
                 node->data[i].data.insert(node->data[i].data.end(), data.data.begin(), data.data.end());
                 return;
@@ -144,7 +177,7 @@ class two3Tree {
         }
         if (node->children.empty()) {
             node->insertCurrentNode(data);
-            while (node != nullptr && node->data.size() == 3) {
+            while (node != nullptr && (int)node->data.size() == 3) {
                 node->pullUp();
                 Node *tmp = node;
                 node = node->parent;
@@ -153,7 +186,7 @@ class two3Tree {
             if (node->parent == nullptr) root = node;
             return;
         }
-        for (int i = 0; i < node->data.size(); i++) {
+        for (int i = 0; i < (int)node->data.size(); i++) {
             if (data.key < node->data[i].key) {
                 _insert(data, node->children[i]);
                 return;
@@ -176,10 +209,19 @@ class two3Tree {
         return size;
     }
 
+    /*
+        Query the data with the key from the tree.
+        @param key: the key to be queried
+        @param node: the node to be queried
+        @return: the node with the key, nullptr if not found
+    */
     Node *_query(int key, Node *node) {
         if (node == nullptr) return nullptr;
-        for (int i = 0; i < node->data.size(); i++) {
+        for (int i = 0; i < (int)node->data.size(); i++) {
             if (key == node->data[i].key) return node;
+        }
+        if (node->children.empty()) return nullptr;
+        for (int i = 0; i < (int)node->data.size(); i++) {
             if (key < node->data[i].key) return _query(key, node->children[i]);
         }
         return _query(key, node->children.back());
@@ -220,25 +262,156 @@ class two3Tree {
         }
         return res;
     }
-
-    void test_printAll() {
-        if (root == nullptr) return;
-        deque<Node *> q;
-        q.push_back(root);
-        while (!q.empty()) {
-            Node *node = q.front();
-            q.pop_front();
-            for (slotData<T> data : node->data) {
-                cout << data.key << " ";
-            }
-            cout << endl;
-            for (Node *child : node->children) q.push_back(child);
-        }
-    }
 };
 
 template <class T>
-class AVL {};
+class AVL {
+    struct Node {
+        slotData<T> data;
+        Node *left;
+        Node *right;
+        Node *parent;
+        int height;
+        Node() : left(nullptr), right(nullptr), parent(nullptr), height(1) {}
+        Node(slotData<T> data) : data(data), left(nullptr), right(nullptr), parent(nullptr), height(1) {}
+
+        void update() {
+            Node *left = this->left;
+            Node *right = this->right;
+            if (left == nullptr && right == nullptr) {
+                height = 1;
+            } else if (left == nullptr) {
+                height = right->height + 1;
+            } else if (right == nullptr) {
+                height = left->height + 1;
+            } else {
+                height = max(left->height, right->height) + 1;
+            }
+        }
+        int BalancedFactor() {
+            Node *left = this->left;
+            Node *right = this->right;
+            if (left == nullptr && right == nullptr) return 0;
+            if (left == nullptr) return -right->height;
+            if (right == nullptr) return left->height;
+            return left->height - right->height;
+        }
+
+        Node *rotateLeft() {
+            Node *new_root = right;
+            right = new_root->left;
+            new_root->left = this;
+            update();
+            new_root->update();
+            return new_root;
+        }
+
+        Node *rotateRight() {
+            Node *new_root = left;
+            left = new_root->right;
+            new_root->right = this;
+            update();
+            new_root->update();
+            return new_root;
+        }
+
+        int _getHeight(Node *node) {
+            if (node == nullptr) return 0;
+            int left_height = _getHeight(node->left);
+            int right_height = _getHeight(node->right);
+            return max(left_height, right_height) + 1;
+        }
+    };
+    Node *root;
+
+    void _clear(Node *&node) {
+        if (node == nullptr) return;
+        _clear(node->left);
+        _clear(node->right);
+        delete node;
+        node = nullptr;
+    }
+
+    void _balance(Node *&node) {
+        node->update();
+        if (node->BalancedFactor() == 2) {
+            if (node->left->BalancedFactor() < 0) node->left = node->left->rotateLeft();
+            node = node->rotateRight();
+        } else if (node->BalancedFactor() == -2) {
+            if (node->right->BalancedFactor() > 0) node->right = node->right->rotateRight();
+            node = node->rotateLeft();
+        }
+    }
+
+    void _insert(slotData<T> data, Node *&node) {
+        if (node == nullptr) {
+            node = new Node(data);
+            return;
+        }
+        if (data.key == node->data.key) {
+            node->data.data.insert(node->data.data.end(), data.data.begin(), data.data.end());
+            return;
+        }
+        if (data.key < node->data.key) {
+            _insert(data, node->left);
+        } else {
+            _insert(data, node->right);
+        }
+        _balance(node);
+    }
+
+    int _getHeight(Node *node) {
+        if (node == nullptr) return 0;
+        return node->height;
+    }
+
+    int _size(Node *node) { // count of nodes
+        if (node == nullptr) return 0;
+        return 1 + _size(node->left) + _size(node->right);
+    }
+
+    Node *_query(int key, Node *node) {
+        if (node == nullptr) return nullptr;
+        if (key == node->data.key) return node;
+        if (key < node->data.key) return _query(key, node->left);
+        return _query(key, node->right);
+    }
+
+    void _printTopKMax(Node *node, int k) {
+        if (node == nullptr) return;
+        _printTopKMax(node->right, k);
+        if (k <= 0) return;
+        cout << node->data.key << " ";
+        _printTopKMax(node->left, k);
+    }
+
+   public:
+    AVL() : root(nullptr) {}
+    ~AVL() { _clear(root); }
+    void insert(int key, T data) {
+        slotData<T> insert_data;
+        insert_data.key = key;
+        insert_data.data.push_back(data);
+        if (root == nullptr) {
+            root = new Node(insert_data);
+            return;
+        }
+        _insert(insert_data, root);
+    }
+
+    int getHeight() { return _getHeight(root); }
+    int size() { return _size(root); }
+    void clear() { _clear(root); }
+
+    vector<T> query(int key) {
+        Node *node = _query(key, root);
+        if (node == nullptr) return {};
+        return node->data.data;
+    }
+
+    vector<T> queryRoot() { return root->data.data; }
+    void printTopKMax(int k) { _printTopKMax(root, k); }
+};
 
 class Data {
     struct _data {
@@ -255,12 +428,14 @@ class Data {
     vector<_data> _data_arr;
 
     two3Tree<int> _btree_by_graduate;
+    AVL<int> _avl_by_student;
 
     string _filename;
 
     void _clear() {
         _data_arr.clear();
         _btree_by_graduate.clear();
+        _avl_by_student.clear();
     }
 
    public:
@@ -294,7 +469,8 @@ class Data {
         return atoi(tmp.c_str());
     }
 
-    bool isEmpty() const { return _data_arr.empty(); }
+    bool isEmpty() { return _data_arr.empty(); }
+    bool isAVLEmpty() { return _avl_by_student.size() == 0; }
     /*
         Read data from file
         @return: 1 for success, 2 for quit, -1 for fail
@@ -345,28 +521,48 @@ class Data {
     }
 
     void build23Tree() {
-        for (int i = 0; i < _data_arr.size(); i++) {
+        for (int i = 0; i < (int)_data_arr.size(); i++) {
             _btree_by_graduate.insert(_data_arr[i].graduate_count, i);
-            _btree_by_graduate.test_printAll();
-            cout << endl;
+        }
+        //_btree_by_graduate.test_printAll();
+    }
+
+    void buildAVL() {
+        for (int i = 0; i < (int)_data_arr.size(); i++) {
+            _avl_by_student.insert(_data_arr[i].student_count, i);
         }
     }
 
-    void buildAVL() {}
-
     void print23TreeInfo() {
-        _btree_by_graduate.test_printAll();
-        cout << endl;
-        cout << "Height: " << _btree_by_graduate.getHeight() << endl;
-        cout << "Size: " << _btree_by_graduate.size() << endl;
-        cout << "Root Data: \n";
+        cout << "Tree height = " << _btree_by_graduate.getHeight() << endl;
+        cout << "Number of nodes = " << _btree_by_graduate.size() << endl;
+
         vector<int> root_data = _btree_by_graduate.queryRoot();
-        for (int i = 0; i < root_data.size(); i++) {
-            cout << i + 1 << "[" << root_data[i] + 1 << "]" << _data_arr[root_data[i]].school_name << ", "
-                 << _data_arr[root_data[i]].department_name << " " << _data_arr[root_data[i]].day_further
-                 << " " << _data_arr[root_data[i]].level << " " << _data_arr[root_data[i]].student_count
-                 << " " << _data_arr[root_data[i]].graduate_count << endl;
+        for (int i = 0; i < (int)root_data.size(); i++) {
+            cout << i + 1 << ": [" << root_data[i] + 1 << "] " << _data_arr[root_data[i]].school_name << ", "
+                 << _data_arr[root_data[i]].department_name << ", " << _data_arr[root_data[i]].day_further
+                 << ", " << _data_arr[root_data[i]].level << ", " << _data_arr[root_data[i]].student_count
+                 << ", " << _data_arr[root_data[i]].graduate_count << endl;
         }
+        cout << endl;
+    }
+
+    void printAVLTreeInfo() {
+        cout << "Tree height = " << _avl_by_student.getHeight() << endl;
+        cout << "Number of nodes = " << _avl_by_student.size() << endl;
+
+        vector<int> root_data = _avl_by_student.queryRoot();
+        for (int i = 0; i < (int)root_data.size(); i++) {
+            cout << i + 1 << ": [" << root_data[i] + 1 << "] " << _data_arr[root_data[i]].school_name << ", "
+                 << _data_arr[root_data[i]].department_name << ", " << _data_arr[root_data[i]].day_further
+                 << ", " << _data_arr[root_data[i]].level << ", " << _data_arr[root_data[i]].student_count
+                 << ", " << _data_arr[root_data[i]].graduate_count << endl;
+        }
+        cout << endl;
+    }
+
+    void printAVLTopKMax(int k) {
+        _avl_by_student.printTopKMax(k);
         cout << endl;
     }
 
@@ -388,21 +584,43 @@ class Solution {
         }
     }
     void case2() {
-        _ds.reset();
-        int state = _ds.read();
-        while (state < 1) {
-            state = _ds.read();
+        if (_ds.isEmpty()) {
+            cout << "### Choose 1 first. ###" << endl;
+            return;
         }
-        if (state == 1) {
+        if (_ds.isAVLEmpty()) {
+            _ds.buildAVL();
+        } else {
+            cout << "### AVL tree has been built. ###\n";
         }
+        _ds.printAVLTreeInfo();
+    }
+
+    void case3() {
+        if (_ds.isEmpty()) {
+            cout << "### Choose 1 first. ###" << endl;
+            return;
+        }
+    }
+
+    void case4() {
+        if (_ds.isAVLEmpty()) {
+            cout << "### Choose 2 first. ###" << endl;
+            return;
+        }
+        int k;
+        cout << "Input k: ";
+        cin >> k;
+        _ds.printAVLTopKMax(k);
     }
 };
 
 void WriteMenu() {
-    cout << "**** Balanced Search Trees ****\n"
+    cout << "\n**** Balanced Search Trees ****\n"
             "* 0. QUIT                     *\n"
             "* 1. Build 23 tree            *\n"
             "* 2. Build AVL tree           *\n"
+            // "* 3. Top K-maximums from AVL tree        *\n"
             "*******************************\n"
             "Input a choice(0, 1, 2): ";
 }
@@ -420,12 +638,13 @@ signed main() {
         } else if (command == "2") {
             sol.case2();
         }
-#ifdef CompileErr0rDEBUGGING
+
         else if (command == "3")
             sol.case3();
 
         else if (command == "4")
             sol.case4();
+#ifdef CompileErr0rDEBUGGING
         else if (command == "5")
             sol.case5();
         else if (command == "6")
