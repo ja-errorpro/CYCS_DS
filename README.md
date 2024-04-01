@@ -47,4 +47,4 @@
 
 ## 作業二 [Source Code](./DS2ex2_17_11127137_11127150/DS2ex2_17_11127137_11127150.cpp)
 * 任務一：建立一棵 2-3 樹，以 `number of graduates` 為 key，相同 key 需合併為同一節點。
-* 任務二：建立一棵 AVL 樹，以 `number of graduates` 為 key，相同 key 需合併為同一節點。
+* 任務二：建立一棵 AVL 樹，以 `number of students` 為 key，相同 key 需合併為同一節點。
