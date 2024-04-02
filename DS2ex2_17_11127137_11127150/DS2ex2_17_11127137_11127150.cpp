@@ -616,7 +616,7 @@ class Data {
     void print23TreeTopKMax() {
         int k;
         int btreeSize = _btree_by_graduate.dataSize();
-        cout << "Enter K in [1, " << btreeSize << "]: ";
+        cout << "\nEnter K in [1, " << btreeSize << "]: ";
         cin >> k;
         if (k < 1 || k > btreeSize) {
             return;
@@ -635,7 +635,7 @@ class Data {
     void printAVLTopKMax() {
         int k;
         int avlSize = _avl_by_student.dataSize();
-        cout << "Enter K in [1, " << avlSize << "]: ";
+        cout << "\nEnter K in [1, " << avlSize << "]: ";
         cin >> k;
         if (k < 1 || k > avlSize) {
             return;
@@ -709,7 +709,7 @@ void WriteMenu() {
             "* 3. Top-K search on 23 tree  *\n"
             "* 4. Top-K search on AVL tree *\n"
             "*******************************\n"
-            "Input a choice(0, 1, 2): ";
+            "Input a choice(0, 1, 2, 3, 4): ";
 }
 
 signed main() {
