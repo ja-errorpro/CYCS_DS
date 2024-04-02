@@ -48,10 +48,13 @@ struct slotData {
 template <class T>
 class two3Tree {
     struct Node {
-        vector<slotData<T>> data; // pair<data, key>
+        vector<slotData<T> > data; // pair<data, key>
         vector<Node *> children;
         Node *parent;
-        Node() : parent(nullptr) {}
+        Node() : parent(nullptr) {
+            data.clear();
+            children.clear();
+        }
         Node(T data) : data(data), parent(nullptr) {}
 
         /*
@@ -148,6 +151,40 @@ class two3Tree {
             left->parent = parent;
             right->parent = parent;
         }
+
+        void push() {
+            Node *emptyNode = nullptr, *targetChild = nullptr;
+            slotData<T> targetData;
+            for (int i = 0; i < (int)children.size(); ++i) {
+                if (children[i] == nullptr) {
+                    throw "Error";
+                }
+                if (children[i]->data.empty()) {
+                    emptyNode = children[i];
+                    if (i == children.size() - 1) {
+                        targetChild = children[i - 1];
+                        targetData = data[i - 1];
+                    } else {
+                        targetChild = children[i + 1];
+                        targetData = data[i];
+                    }
+                }
+            }
+
+            if (!emptyNode->children.empty()) {
+                targetChild->insertChildNode(emptyNode->children[0]);
+                emptyNode->children[0]->parent = targetChild;
+            }
+
+            targetChild->insertCurrentNode(targetData);
+            popCurrentNode(targetData.key);
+            popChildNode(emptyNode);
+            delete emptyNode;
+
+            if (targetChild->data.size() == 3) {
+                targetChild->pullUp();
+            }
+        }
     };
 
     Node *root;
@@ -210,14 +247,6 @@ class two3Tree {
         return size;
     }
 
-    int _dataSize(Node *node) { // count of data
-        if (node == nullptr) return 0;
-        int size = 0;
-        for (slotData<T> data : node->data) size += data.data.size();
-        for (Node *child : node->children) size += _dataSize(child);
-        return size;
-    }
-
     /*
         Query the data with the key from the tree.
         @param key: the key to be queried
@@ -236,26 +265,43 @@ class two3Tree {
         return _query(key, node->children.back());
     }
 
-    void _getTopKMax(Node *node, int k, vector<T> &res) {
-        if (res.size() >= k) return;
+    void _pop(int key, Node *node) {
         if (node == nullptr) return;
-        if (node->children.empty()) {
-            for (int i = (int)node->data.size() - 1; i >= 0; i--) {
-                if ((int)res.size() >= k) return;
-                for (int j = 0; j < node->data[i].data.size(); j++) {
-                    res.push_back(node->data[i].data[j]);
+        Node *target = _query(key, node);
+        if (target == nullptr) return;
+        if (!target->children.empty()) {
+            int targetIdx = 0;
+            for (int i = 0; i < (int)target->data.size(); i++) {
+                if (key == target->data[i].key) {
+                    targetIdx = i;
+                    break;
                 }
             }
-            return;
+            Node *rightMin = target->children[targetIdx + 1];
+            while (!rightMin->children.empty()) {
+                rightMin = rightMin->children[0];
+            }
+            target->popCurrentNode(key);
+            target->insertCurrentNode(rightMin->data[0]);
+            rightMin->popCurrentNode(rightMin->data[0].key);
+            target = rightMin;
+        } else {
+            target->popCurrentNode(key);
         }
 
-        for (int i = (int)node->children.size() - 1; i >= 0; i--) {
-            _getTopKMax(node->children[i], k, res);
-            if ((int)res.size() >= k) return;
-            if (i - 1 >= 0 && !node->data[i - 1].data.empty()) {
-                for (int j = 0; j < node->data[i - 1].data.size(); j++) {
-                    res.push_back(node->data[i - 1].data[j]);
-                }
+        while (target->parent != nullptr && target->data.empty()) {
+            target = target->parent;
+            target->push();
+        }
+
+        if (target->parent == nullptr && target->data.empty()) {
+            if (!target->children.empty()) {
+                root = target->children[0];
+                root->parent = nullptr;
+                delete target;
+            } else {
+                delete target;
+                root = nullptr;
             }
         }
     }
@@ -277,14 +323,8 @@ class two3Tree {
 
     int getHeight() { return _getHeight(root); }
     int size() { return _size(root); }
-    int dataSize() { return _dataSize(root); }
     void clear() { _clear(root); }
-
-    vector<T> queryTopKMax(int k) {
-        vector<T> res;
-        _getTopKMax(root, k, res);
-        return res;
-    }
+    void pop(int key) { _pop(key, root); }
 
     vector<T> query(int key) {
         Node *node = _query(key, root);
@@ -296,12 +336,26 @@ class two3Tree {
     }
 
     vector<T> queryRoot() {
+        if (root == nullptr) {
+            cout << "Tree is empty\n";
+            return {};
+        }
         vector<T> res;
         for (slotData<T> data : root->data) {
             res.insert(res.end(), data.data.begin(), data.data.end());
         }
         return res;
     }
+
+    void _printAll(Node *node) {
+        if (node == nullptr) return;
+        for (slotData<T> data : node->data) {
+            cout << data.key << " ";
+        }
+        cout << endl;
+        for (Node *child : node->children) _printAll(child);
+    }
+    void __printAll() { _printAll(root); }
 };
 
 template <class T>
@@ -410,11 +464,6 @@ class AVL {
         return 1 + _size(node->left) + _size(node->right);
     }
 
-    int _DataSize(Node *node) { // count of data
-        if (node == nullptr) return 0;
-        return node->data.data.size() + _DataSize(node->left) + _DataSize(node->right);
-    }
-
     Node *_query(int key, Node *node) {
         if (node == nullptr) return nullptr;
         if (key == node->data.key) return node;
@@ -422,14 +471,12 @@ class AVL {
         return _query(key, node->right);
     }
 
-    void _getTopKMax(Node *node, int k, vector<T> &res) {
+    void _printTopKMax(Node *node, int k) {
         if (node == nullptr) return;
-        _getTopKMax(node->right, k, res);
-        if ((int)res.size() < k) {
-            res.insert(res.end(), node->data.data.begin(), node->data.data.end());
-        }
-        if ((int)res.size() >= k) return;
-        _getTopKMax(node->left, k, res);
+        _printTopKMax(node->right, k);
+        if (k <= 0) return;
+        cout << node->data.key << " ";
+        _printTopKMax(node->left, k);
     }
 
    public:
@@ -448,7 +495,6 @@ class AVL {
 
     int getHeight() { return _getHeight(root); }
     int size() { return _size(root); }
-    int dataSize() { return _DataSize(root); }
     void clear() { _clear(root); }
 
     vector<T> query(int key) {
@@ -458,11 +504,7 @@ class AVL {
     }
 
     vector<T> queryRoot() { return root->data.data; }
-    vector<T> queryTopKMax(int k) {
-        vector<T> res;
-        _getTopKMax(root, k, res);
-        return res;
-    }
+    void printTopKMax(int k) { _printTopKMax(root, k); }
 };
 
 class Data {
@@ -613,41 +655,18 @@ class Data {
         cout << endl;
     }
 
-    void print23TreeTopKMax() {
-        int k;
-        int btreeSize = _btree_by_graduate.dataSize();
-        cout << "\nEnter K in [1, " << btreeSize << "]: ";
-        cin >> k;
-        if (k < 1 || k > btreeSize) {
-            return;
-        }
-        vector<int> topKMax = _btree_by_graduate.queryTopKMax(k);
-        assert(topKMax.size() == k);
-        for (int i = 0; i < k; i++) {
-            cout << i + 1 << ": [" << topKMax[i] + 1 << "] " << _data_arr[topKMax[i]].school_name << ", "
-                 << _data_arr[topKMax[i]].department_name << ", " << _data_arr[topKMax[i]].day_further << ", "
-                 << _data_arr[topKMax[i]].level << ", " << _data_arr[topKMax[i]].student_count << ", "
-                 << _data_arr[topKMax[i]].graduate_count << endl;
-        }
+    void printAVLTopKMax(int k) {
+        _avl_by_student.printTopKMax(k);
         cout << endl;
     }
 
-    void printAVLTopKMax() {
-        int k;
-        int avlSize = _avl_by_student.dataSize();
-        cout << "\nEnter K in [1, " << avlSize << "]: ";
-        cin >> k;
-        if (k < 1 || k > avlSize) {
-            return;
-        }
-        vector<int> topKMax = _avl_by_student.queryTopKMax(k);
-        for (int i = 0; i < k; i++) {
-            cout << i + 1 << ": [" << topKMax[i] + 1 << "] " << _data_arr[topKMax[i]].school_name << ", "
-                 << _data_arr[topKMax[i]].department_name << ", " << _data_arr[topKMax[i]].day_further << ", "
-                 << _data_arr[topKMax[i]].level << ", " << _data_arr[topKMax[i]].student_count << ", "
-                 << _data_arr[topKMax[i]].graduate_count << endl;
-        }
-        cout << endl;
+    void printRemove() {
+        int key;
+        cout << "Input key: ";
+        cin >> key;
+        _btree_by_graduate.pop(key);
+        _btree_by_graduate.__printAll();
+        print23TreeInfo();
     }
 
 }; // class Data
@@ -685,19 +704,25 @@ class Solution {
             cout << "### Choose 1 first. ###" << endl;
             return;
         }
-        _ds.print23TreeTopKMax();
     }
 
     void case4() {
-        if (_ds.isEmpty()) {
-            cout << "### Choose 1 first. ###" << endl;
-            return;
-        }
         if (_ds.isAVLEmpty()) {
             cout << "### Choose 2 first. ###" << endl;
             return;
         }
-        _ds.printAVLTopKMax();
+        int k;
+        cout << "Input k: ";
+        cin >> k;
+        _ds.printAVLTopKMax(k);
+    }
+
+    void case5() {
+        if (_ds.isEmpty()) {
+            cout << "### Choose 1 first. ###" << endl;
+            return;
+        }
+        _ds.printRemove();
     }
 };
 
@@ -706,10 +731,9 @@ void WriteMenu() {
             "* 0. QUIT                     *\n"
             "* 1. Build 23 tree            *\n"
             "* 2. Build AVL tree           *\n"
-            "* 3. Top-K search on 23 tree  *\n"
-            "* 4. Top-K search on AVL tree *\n"
+            // "* 3. Top K-maximums from AVL tree        *\n"
             "*******************************\n"
-            "Input a choice(0, 1, 2, 3, 4): ";
+            "Input a choice(0, 1, 2): ";
 }
 
 signed main() {
@@ -731,9 +755,10 @@ signed main() {
 
         else if (command == "4")
             sol.case4();
-#ifdef CompileErr0rDEBUGGING
+
         else if (command == "5")
             sol.case5();
+#ifdef CompileErr0rDEBUGGING
         else if (command == "6")
             sol.case6();
         else if (command == "7")
