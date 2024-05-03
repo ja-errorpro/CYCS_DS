@@ -43,6 +43,24 @@ struct StudentData {
         // memset(score, 0, sizeof(score));
     }
 };
+
+struct hashStudentData {
+    char student_id[10];
+    char student_name[10];
+    float average_score;
+    hashStudentData() : average_score(0) {}
+    hashStudentData(StudentData &data) {
+        strncpy(student_id, data.student_id, 10);
+        strncpy(student_name, data.student_name, 10);
+        average_score = data.average_score;
+    }
+    hashStudentData &operator=(const StudentData &data) {
+        strncpy(student_id, data.student_id, 10);
+        strncpy(student_name, data.student_name, 10);
+        average_score = data.average_score;
+        return *this;
+    }
+};
 int stoi(const string &str) {
     string tmp;
     for (char c : str) {
@@ -150,23 +168,24 @@ class MinPrimeSearcher {
 } minPrimeSearcher;
 
 class QuadraticProbingHashTable {
-    vector<pair<int, int>> table; // index, hash value
+    vector<pair<hashStudentData, int>> table; // data, hash value
     int hash_table_size;
     int origin_data_size;
     int total_success;
     int total_failure;
 
-    int _insert(string key, int data) {
+    int _insert(string key, hashStudentData data) {
         int index = hash(key);
-        pair<int, int> tmp = make_pair(data, index);
+        pair<hashStudentData, int> tmp = make_pair(data, index);
         int i = 1;
         int original_index = index;
-        while (table[index].first != -1) {
+        while (table[index].second != -1 && i < hash_table_size) {
             index = (original_index % hash_table_size +
                      (i % hash_table_size) * (i % hash_table_size) % hash_table_size) %
                     hash_table_size;
             i++;
         }
+        if (i >= hash_table_size) return -1;
         table[index] = tmp;
         return i;
     }
@@ -176,7 +195,7 @@ class QuadraticProbingHashTable {
         : origin_data_size(0), hash_table_size(0), total_success(0), total_failure(0) {}
     QuadraticProbingHashTable(int size) : origin_data_size(size), total_success(0), total_failure(0) {
         this->hash_table_size = minPrimeSearcher.getMinPrime((int)ceil(1.15 * origin_data_size));
-        table.resize(this->hash_table_size, make_pair(-1, -1));
+        table.resize(this->hash_table_size, make_pair(hashStudentData(), -1));
     }
     ~QuadraticProbingHashTable() { clear(); }
     int hash(string key) {
@@ -188,14 +207,16 @@ class QuadraticProbingHashTable {
         }
         return sum % hash_table_size;
     }
-    void insert(string key, int data) {
+    bool insert(string key, hashStudentData data) {
         int success_search_cnt = _insert(key, data);
+        if (success_search_cnt == -1) return false;
         total_success += success_search_cnt;
+        return true;
     }
     int countFailedSearch(int index) {
         int original_index = index;
         int cnt = 1;
-        while (table[index].first != -1) {
+        while (table[index].second != -1 && cnt < hash_table_size) {
             index = ((original_index % hash_table_size) +
                      (cnt % hash_table_size) * (cnt % hash_table_size) % hash_table_size) %
                     hash_table_size;
@@ -215,7 +236,21 @@ class QuadraticProbingHashTable {
         total_failure -= hash_table_size;
     }
 
-    vector<pair<int, int>> getTable() { return table; }
+    vector<pair<StudentData, int>> getTable() {
+        vector<pair<StudentData, int>> res;
+        for (int i = 0; i < hash_table_size; i++) {
+            if (table[i].second != -1) {
+                StudentData tmp;
+                strncpy(tmp.student_id, table[i].first.student_id, 10);
+                strncpy(tmp.student_name, table[i].first.student_name, 10);
+                tmp.average_score = table[i].first.average_score;
+                res.push_back(make_pair(tmp, table[i].second));
+            } else {
+                res.push_back(make_pair(StudentData(), -1));
+            }
+        }
+        return res;
+    }
 
     void printStatistics() {
         cout << fixed << setprecision(4) << "unsuccessful search: " << (float)total_failure / hash_table_size
@@ -235,17 +270,16 @@ class QuadraticProbingHashTable {
 };
 
 class DoubleHash {
-    vector<pair<StudentData, int>> table; // data, hash value
+    vector<pair<hashStudentData, int>> table; // data, hash value
     int hash_table_size;
     int origin_data_size;
     int total_success;
     int maxStep;
 
-    int _insert(string key, StudentData data) {
+    int _insert(string key, hashStudentData data) {
         int index = hash(key);
-        pair<StudentData, int> tmp = make_pair(data, index);
+        pair<hashStudentData, int> tmp = make_pair(data, index);
         int success_search_count = 1;
-        int original_index = index;
         int step = 1;
         int len = key.size();
         for (int i = 0; i < len; i++) {
@@ -253,10 +287,11 @@ class DoubleHash {
         }
         step = maxStep - step % maxStep;
 
-        while (table[index].second != -1) {
+        while (table[index].second != -1 && success_search_count < hash_table_size) {
             index = (index + step) % hash_table_size;
             success_search_count++;
         }
+        if (success_search_count >= hash_table_size) return -1;
         table[index] = tmp;
         return success_search_count;
     }
@@ -265,7 +300,7 @@ class DoubleHash {
     DoubleHash() : origin_data_size(0), hash_table_size(0), total_success(0), maxStep(0) {}
     DoubleHash(int size) : origin_data_size(size), total_success(0) {
         this->hash_table_size = minPrimeSearcher.getMinPrime((int)ceil(1.15 * origin_data_size));
-        table.resize(this->hash_table_size, make_pair(StudentData(), -1));
+        table.resize(this->hash_table_size, make_pair(hashStudentData(), -1));
         maxStep = minPrimeSearcher.getMinPrime(ceil((float)origin_data_size / 5));
     }
     int hash(string key) {
@@ -277,12 +312,28 @@ class DoubleHash {
         }
         return sum % hash_table_size;
     }
-    void insert(string key, StudentData data) {
+    bool insert(string key, StudentData data) {
         int success_search_cnt = _insert(key, data);
+        if (success_search_cnt == -1) return false;
         total_success += success_search_cnt;
+        return true;
     }
 
-    vector<pair<StudentData, int>> getTable() { return table; }
+    vector<pair<StudentData, int>> getTable() {
+        vector<pair<StudentData, int>> res;
+        for (int i = 0; i < hash_table_size; i++) {
+            if (table[i].second != -1) {
+                StudentData tmp;
+                strncpy(tmp.student_id, table[i].first.student_id, 10);
+                strncpy(tmp.student_name, table[i].first.student_name, 10);
+                tmp.average_score = table[i].first.average_score;
+                res.push_back(make_pair(tmp, table[i].second));
+            } else {
+                res.push_back(make_pair(StudentData(), -1));
+            }
+        }
+        return res;
+    }
 
     void printStatistics() {
         cout << "successful search: " << (float)total_success / origin_data_size << " comparisons on average"
@@ -350,11 +401,16 @@ class Data {
 
     void buildQuadratic() {
         quadratic_hash_table = QuadraticProbingHashTable(original_student_data.size());
-        for (int i = 0; i < original_student_data.size(); i++) {
+        int len = original_student_data.size();
+        for (int i = 0; i < len; i++) {
             // cerr << "Inserting: " << original_student_data[i].student_id << endl;
             // cerr << "Hash: " << hash_table.hash(original_student_data[i].student_id) << endl;
             string key = original_student_data[i].student_id;
-            quadratic_hash_table.insert(key, i);
+            bool success = quadratic_hash_table.insert(key, original_student_data[i]);
+            if (!success) {
+                cout << "### Failed at [ " << i << "]. ###" << endl;
+                return;
+            }
         }
     }
 
@@ -364,18 +420,18 @@ class Data {
     }
 
     void writeQuadraticHashTable() {
-        vector<pair<int, int>> table = quadratic_hash_table.getTable();
+        vector<pair<StudentData, int>> table = quadratic_hash_table.getTable();
         quadratic_output_file_name = "quadratic" + file_number + ".txt";
         ofstream fout(quadratic_output_file_name);
         fout << " --- Hash table created by Quadratic probing ---\n";
-        for (int i = 0; i < table.size(); i++) {
-            if (table[i].first != -1) {
-                int index = table[i].first;
+        int len = table.size();
+        for (int i = 0; i < len; i++) {
+            if (table[i].second != -1) {
+                int index = table[i].second;
                 fout << "[" << setw(3) << i << "] ";
-                fout << setw(10) << table[i].second << ", " << setw(10)
-                     << original_student_data[index].student_id << ", " << setw(10)
-                     << original_student_data[index].student_name << ", " << setw(10)
-                     << original_student_data[index].average_score << endl;
+                fout << setw(10) << index << ", " << setw(10) << table[i].first.student_id << ", " << setw(10)
+                     << table[i].first.student_name << ", " << setw(10) << table[i].first.average_score
+                     << endl;
             } else
                 fout << "[" << setw(3) << i << "] " << endl;
         }
@@ -385,9 +441,14 @@ class Data {
 
     void buildDoubleHashTable() {
         double_hash_table = DoubleHash(original_student_data.size());
-        for (int i = 0; i < original_student_data.size(); i++) {
+        int len = original_student_data.size();
+        for (int i = 0; i < len; i++) {
             string key = original_student_data[i].student_id;
-            double_hash_table.insert(key, original_student_data[i]);
+            bool success = double_hash_table.insert(key, original_student_data[i]);
+            if (!success) {
+                cout << "### Failed at [ " << i << "]. ###" << endl;
+                return;
+            }
         }
     }
 
@@ -398,7 +459,8 @@ class Data {
         string double_output_file_name = "double" + file_number + ".txt";
         ofstream fout(double_output_file_name);
         fout << " --- Hash table created by Double hashing    ---\n";
-        for (int i = 0; i < table.size(); i++) {
+        int len = table.size();
+        for (int i = 0; i < len; i++) {
             if (table[i].second != -1) {
                 int index = table[i].second;
                 fout << "[" << setw(3) << i << "] ";
@@ -441,11 +503,11 @@ class Solution {
     }
 };
 void WriteMenu() {
-    cout << "\n******* Hash Table *****\n"
+    cout << "\n******* Hash Table ******\n"
             "* 0. QUIT              *\n"
             "* 1. Quadratic probing *\n"
             "* 2. Double hashing    *\n"
-            "************************\n"
+            "*************************************\n"
             "Input a choice(0, 1, 2): ";
 }
 signed main() {
