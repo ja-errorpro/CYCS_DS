@@ -394,6 +394,13 @@ class Data {
         ifstream fin(input_file_name, ios::binary);
         StudentData tmp;
         while (fin.read((char *)&tmp, sizeof(StudentData))) {
+            if (fin.bad()) {
+                cerr << "### Bad bit. ###" << endl;
+                break;
+            } else if (fin.fail()) {
+                cerr << "### Fail bit. ###" << endl;
+                break;
+            }
             original_student_data.push_back(tmp);
         }
         fin.close();
