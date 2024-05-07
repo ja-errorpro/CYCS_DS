@@ -60,6 +60,13 @@ struct hashStudentData {
         average_score = data.average_score;
         return *this;
     }
+    StudentData toStudentData() {
+        StudentData tmp;
+        strncpy(tmp.student_id, student_id, 10);
+        strncpy(tmp.student_name, student_name, 10);
+        tmp.average_score = average_score;
+        return tmp;
+    }
 };
 int stoi(const string &str) {
     string tmp;
@@ -173,6 +180,7 @@ class QuadraticProbingHashTable {
     int origin_data_size;
     int total_success;
     int total_failure;
+    int last_search_count;
 
     int _insert(string key, hashStudentData data) {
         int index = hash(key);
@@ -190,10 +198,30 @@ class QuadraticProbingHashTable {
         return i;
     }
 
+    pair<hashStudentData, int> _search(string key) {
+        int index = hash(key);
+        int i = 1;
+        int original_index = index;
+        while (table[index].second != -1 && i < hash_table_size) {
+            if (strcmp(table[index].first.student_id, key.c_str()) == 0) {
+                last_search_count = i;
+                return table[index];
+            }
+            index = (original_index % hash_table_size +
+                     (i % hash_table_size) * (i % hash_table_size) % hash_table_size) %
+                    hash_table_size;
+            i++;
+        }
+
+        last_search_count = i;
+        return make_pair(hashStudentData(), -1);
+    }
+
    public:
     QuadraticProbingHashTable()
-        : origin_data_size(0), hash_table_size(0), total_success(0), total_failure(0) {}
-    QuadraticProbingHashTable(int size) : origin_data_size(size), total_success(0), total_failure(0) {
+        : origin_data_size(0), hash_table_size(0), total_success(0), total_failure(0), last_search_count(0) {}
+    QuadraticProbingHashTable(int size)
+        : origin_data_size(size), total_success(0), total_failure(0), last_search_count(0) {
         this->hash_table_size = minPrimeSearcher.getMinPrime((int)ceil(1.15 * origin_data_size));
         table.resize(this->hash_table_size, make_pair(hashStudentData(), -1));
     }
@@ -252,12 +280,19 @@ class QuadraticProbingHashTable {
         return res;
     }
 
+    pair<StudentData, int> search(string key) {
+        return make_pair(_search(key).first.toStudentData(), _search(key).second);
+    }
+
+    int getLastSearchCount() { return last_search_count; }
+
     void printStatistics() {
         cout << fixed << setprecision(4) << "unsuccessful search: " << (float)total_failure / hash_table_size
              << " comparisons on average" << endl;
 
-        cout << "\nsuccessful search: " << (float)total_success / origin_data_size
-             << " comparisons on average" << endl;
+        cout << "successful search: " << (float)total_success / origin_data_size << " comparisons on average"
+             << endl;
+        cout << resetiosflags(ios::fixed);
     }
 
     void clear() {
@@ -275,6 +310,7 @@ class DoubleHash {
     int origin_data_size;
     int total_success;
     int maxStep;
+    int last_search_count;
 
     int _insert(string key, hashStudentData data) {
         int index = hash(key);
@@ -296,9 +332,32 @@ class DoubleHash {
         return success_search_count;
     }
 
+    pair<hashStudentData, int> _search(string key) {
+        int index = hash(key);
+        int success_search_count = 1;
+        int step = 1;
+        int len = key.size();
+        for (int i = 0; i < len; i++) {
+            step = step * key[i] % maxStep;
+        }
+        step = maxStep - step % maxStep;
+
+        while (table[index].second != -1 && success_search_count < hash_table_size) {
+            if (strcmp(table[index].first.student_id, key.c_str()) == 0) {
+                last_search_count = success_search_count;
+                return table[index];
+            }
+            index = (index + step) % hash_table_size;
+            success_search_count++;
+        }
+        last_search_count = success_search_count;
+        return make_pair(hashStudentData(), -1);
+    }
+
    public:
-    DoubleHash() : origin_data_size(0), hash_table_size(0), total_success(0), maxStep(0) {}
-    DoubleHash(int size) : origin_data_size(size), total_success(0) {
+    DoubleHash()
+        : origin_data_size(0), hash_table_size(0), total_success(0), maxStep(0), last_search_count(0) {}
+    DoubleHash(int size) : origin_data_size(size), total_success(0), last_search_count(0) {
         this->hash_table_size = minPrimeSearcher.getMinPrime((int)ceil(1.15 * origin_data_size));
         table.resize(this->hash_table_size, make_pair(hashStudentData(), -1));
         maxStep = minPrimeSearcher.getMinPrime(ceil((float)origin_data_size / 5));
@@ -319,6 +378,10 @@ class DoubleHash {
         return true;
     }
 
+    pair<StudentData, int> search(string key) {
+        return make_pair(_search(key).first.toStudentData(), _search(key).second);
+    }
+
     vector<pair<StudentData, int>> getTable() {
         vector<pair<StudentData, int>> res;
         for (int i = 0; i < hash_table_size; i++) {
@@ -336,9 +399,12 @@ class DoubleHash {
     }
 
     void printStatistics() {
-        cout << "successful search: " << (float)total_success / origin_data_size << " comparisons on average"
-             << endl;
+        cout << fixed << setprecision(4) << "successful search: " << (float)total_success / origin_data_size
+             << " comparisons on average" << endl;
+        cout << resetiosflags(ios::fixed);
     }
+
+    int getLastSearchCount() { return last_search_count; }
 
     void clear() {
         table.clear();
@@ -446,6 +512,34 @@ class Data {
         fout.close();
     }
 
+    void requestSearch(int case_num) {
+        cout << "Input a student ID to search ([0] Quit): ";
+        string key;
+        cin >> key;
+        cin.ignore();
+        while (key != "0") {
+            int last_search_count = 0;
+            pair<StudentData, int> res;
+            if (case_num == 1) {
+                res = quadratic_hash_table.search(key);
+                last_search_count = quadratic_hash_table.getLastSearchCount();
+            } else {
+                res = double_hash_table.search(key);
+                last_search_count = double_hash_table.getLastSearchCount();
+            }
+            if (res.second == -1) {
+                cout << key << " is not found after " << last_search_count << " probes.\n";
+            } else {
+                // ex: { 10427128, 江峻瑋, 74.83 } is found after 3 probes.
+                cout << "\n{ " << res.first.student_id << ", " << res.first.student_name << ", "
+                     << res.first.average_score << " } is found after " << last_search_count << " probes.\n";
+            }
+            cout << "\nInput a student ID to search ([0] Quit): ";
+            cin >> key;
+            cin.ignore();
+        }
+    }
+
     void buildDoubleHashTable() {
         double_hash_table = DoubleHash(original_student_data.size());
         int len = original_student_data.size();
@@ -496,6 +590,7 @@ class Solution {
         cout << "\nHash table has been successfully created by Quadratic probing" << endl;
         data.printQuadraticStatistics();
         data.writeQuadraticHashTable();
+        data.requestSearch(1);
     }
 
     void case2() {
@@ -507,6 +602,7 @@ class Solution {
         cout << "\nHash table has been successfully created by Double hashing" << endl;
         data.printDoubleStatistics();
         data.writeDoubleHashTable();
+        data.requestSearch(2);
     }
 };
 void WriteMenu() {
