@@ -48,3 +48,16 @@
 ## 作業二 [Source Code](./DS2ex2_17_11127137_11127150/DS2ex2_17_11127137_11127150%20Quiz.cpp)
 * 任務一：建立一棵 2-3 樹，以 `number of graduates` 為 key，相同 key 需合併為同一節點。
 * 任務二：建立一棵 AVL 樹，以 `number of students` 為 key，相同 key 需合併為同一節點。
+
+## 作業三 [Source Code](./DS2ex3_17_11127137_11127150/DS2ex3_17_11127137_11127150Quiz.cpp)
+* 任務一：採用 quadratic probing 建立雜湊表，以 student_id 為 key。
+
+tableSize = 比 1.15\*dataSize 大的最小質數。
+
+$$ hash(key) = \Pi student[0..|student|-1] \% tableSize $$
+
+* 任務二：採用 double hashing 建立雜湊表，以 student_id 為 key。
+
+maxStep = 比 dataSize / 5 大的最小質數。
+
+$$ step = maxStep - ( \Pi student[0..|student|-1] \% maxStep) $$
