@@ -23,6 +23,7 @@
 #include <map>
 #include <new>
 #include <queue>
+#include <set>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -58,7 +59,8 @@ struct Node {
     string ID;
     vector<Edge> adj;
     int Nodesize;
-    Node(string ID) : ID(ID), Nodesize(0) {}
+    int depth;
+    Node(string ID) : ID(ID), Nodesize(0), depth(0) {}
 
     void addEdge(Node *dest, float weight) {
         adj.push_back({dest, weight});
@@ -77,22 +79,20 @@ class adjList {
 
    public:
     // vector<Node *> list;
-    map<string, list<Node *>, less<string>> edge_list;
-
+    map<string, Node *, less<string>> edge_list;
+    ~adjList() { clear(); }
     void build(vector<StudentData> data) {
         for (auto &i : data) {
             if (edge_list.count(i.postID) == 0) {
-                edge_list[i.postID] = list<Node *>();
-                edge_list[i.postID].push_back(new Node(i.postID));
+                edge_list[i.postID] = new Node(i.postID);
             }
             if (edge_list.count(i.getID) == 0) {
-                edge_list[i.getID] = list<Node *>();
-                edge_list[i.getID].push_back(new Node(i.getID));
+                edge_list[i.getID] = new Node(i.getID);
             }
-            edge_list[i.postID].front()->addEdge(edge_list[i.getID].front(), i.weight);
+            edge_list[i.postID]->addEdge(edge_list[i.getID], i.weight);
         }
         for (auto &i : edge_list) {
-            for (auto &j : i.second) j->sortAdj();
+            i.second->sortAdj();
         }
 
         // sort(list.begin(), list.end(), [](const Node *i, const Node *j) { return i->ID < j->ID; });
@@ -101,7 +101,7 @@ class adjList {
 
     void clear() {
         for (auto &i : edge_list) {
-            for (auto &j : i.second) delete j;
+            delete i.second;
         }
         edge_list.clear();
         IDsize = 0;
@@ -120,10 +120,10 @@ class adjList {
         }*/
 
         for (auto &i : edge_list) {
-            cout << "\n[" << i.first << "] " << i.second.front()->ID << ": ";
-            for (int j = 0; j < i.second.front()->adj.size(); j++) {
-                cout << "(" << j + 1 << ") " << i.second.front()->adj[j].first->ID << ", "
-                     << i.second.front()->adj[j].second << " ";
+            cout << "\n[" << i.first << "] " << i.second->ID << ": ";
+            for (int j = 0; j < i.second->adj.size(); j++) {
+                cout << "(" << j + 1 << ") " << i.second->adj[j].first->ID << ", " << i.second->adj[j].second
+                     << " ";
                 Nodesize++;
             }
         }
@@ -145,17 +145,17 @@ class adjList {
         }*/
         int k = 1;
         for (auto &i : edge_list) {
-            fout << "[" << setw(3) << k++ << "] " << i.second.front()->ID << ": \n";
-            for (int j = 0; j < i.second.front()->adj.size(); j++) {
-                fout << "\t(" << setw(2) << j + 1 << ") " << i.second.front()->adj[j].first->ID << ", "
-                     << setw(5) << i.second.front()->adj[j].second;
+            fout << "[" << setw(3) << k++ << "] " << i.second->ID << ": \n";
+            for (int j = 0; j < i.second->adj.size(); j++) {
+                fout << "\t(" << setw(2) << j + 1 << ") " << i.second->adj[j].first->ID << ", " << setw(6)
+                     << i.second->adj[j].second;
                 Nodesize++;
                 if ((j + 1) % 12 == 0) fout << endl;
             }
             fout << endl;
         }
 
-        fout << "\n<<< There are " << Nodesize << " nodes in total. >>>" << endl;
+        fout << "<<< There are " << Nodesize << " nodes in total. >>>" << endl;
     }
 
     void printIDSize() { cout << "\n<<< There are " << IDsize << " IDs in total. >>>" << endl; }
@@ -165,6 +165,10 @@ class adjList {
     struct EdgeComparator {
         bool operator()(const Edge &i, const Edge &j) { return i.first->ID > j.first->ID; }
         bool operator()(const pair<string, vector<Edge>> &i, const pair<string, vector<Edge>> &j) {
+            if (i.second.size() == j.second.size()) return i.first > j.first;
+            return i.second.size() < j.second.size();
+        }
+        bool operator()(const pair<string, vector<string>> &i, const pair<string, vector<string>> &j) {
             if (i.second.size() == j.second.size()) return i.first > j.first;
             return i.second.size() < j.second.size();
         }
@@ -193,13 +197,48 @@ class adjList {
         return result;
     }
 
+    struct CompareCost {
+        bool operator()(const Node *a, const Node *b) { return a->depth < b->depth; }
+        bool operator()(const priority_queue<string, vector<string>, greater<string>> &a,
+                        const priority_queue<string, vector<string>, greater<string>> &b) {
+            return a.size() < b.size();
+        }
+    };
+
+    // use priority queue
+    priority_queue<Edge, vector<Edge>, EdgeComparator> SingleSourceBFS2(Node *src) {
+        priority_queue<Edge, vector<Edge>, EdgeComparator> result;
+        unordered_map<string, bool> visited;
+
+        priority_queue<Node *, vector<Node *>, CompareCost> bfs_first_queue;
+        bfs_first_queue.push(src);
+        visited[src->ID] = 1;
+
+        while (!bfs_first_queue.empty()) {
+            Node *current = bfs_first_queue.top();
+
+            bfs_first_queue.pop();
+            for (auto &i : current->adj) {
+                if (visited.count(i.first->ID) == 0) {
+                    bfs_first_queue.push(i.first);
+                    i.first->depth = current->depth + 1;
+                    visited[i.first->ID] = 1;
+                    result.push(i);
+                }
+            }
+        }
+
+        return result;
+    }
+
     void writeTraverseAll(string filename) {
         ofstream fout(filename);
+        fout << "<<< There are " << IDsize << " IDs in total. >>>" << endl;
         priority_queue<pair<string, vector<Edge>>, vector<pair<string, vector<Edge>>>, EdgeComparator>
             result_heap;
-        fout << "<<< There are " << IDsize << " IDs in total. >>>" << endl;
+
         for (auto &i : edge_list) {
-            auto bfs_result = SingleSourceBFS(i.second.front());
+            auto bfs_result = SingleSourceBFS2(i.second);
             vector<Edge> tmp;
             while (!bfs_result.empty()) {
                 tmp.push_back(bfs_result.top());
@@ -207,20 +246,6 @@ class adjList {
             }
             result_heap.push({i.first, tmp});
         }
-        /*vector<pair<string, vector<Edge>>> result;
-        while (!result_heap.empty()) { // convert heap to vector
-            result.push_back(result_heap.top());
-            result_heap.pop();
-        }
-        for (int i = 0; i < result.size(); i++) {
-            fout << "[" << setw(3) << i + 1 << "] " << result[i].first << "(" << result[i].second.size()
-                 << "): \n";
-            for (int j = 0; j < result[i].second.size(); j++) {
-                fout << "\t(" << setw(2) << j + 1 << ") " << result[i].second[j].first->ID;
-                if ((j + 1) % 12 == 0) fout << endl;
-            }
-            fout << endl;
-        }*/
 
         int k = 1;
         while (!result_heap.empty()) {
@@ -259,7 +284,10 @@ class FileHandler {
             cout << "\nInput a file number ([0] Quit): ";
             cin >> file_number;
             cin.ignore();
-            if (file_number == "0") return -2;
+            if (file_number == "0") {
+                file_number.clear();
+                return -2;
+            }
             input_file_name = "pairs" + file_number + ".bin";
         }
         ifstream fin(input_file_name);
@@ -306,7 +334,7 @@ class FileHandler {
         graph.writeTraverseAll(output_file_name);
         auto end = chrono::high_resolution_clock::now();
         chrono::duration<double> elapsed = end - start;
-        cerr << "Time: " << chrono::duration_cast<chrono::milliseconds>(elapsed).count() << " ms\n";
+        // cerr << "Time: " << chrono::duration_cast<chrono::milliseconds>(elapsed).count() << " ms\n";
     }
 };
 
@@ -317,7 +345,7 @@ class Solution {
     Solution() {}
     void case1() {
         fileHandler.clear();
-        if (fileHandler.read() == -1) return;
+        if (fileHandler.read() < 0) return;
         fileHandler.readData();
         fileHandler.buildGraph();
         fileHandler.writeGraph();

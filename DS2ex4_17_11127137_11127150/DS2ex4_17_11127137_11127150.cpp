@@ -75,6 +75,7 @@ class adjList {
 
    public:
     vector<Node *> list;
+    ~adjList() { clear(); }
     void build(vector<StudentData> data) {
         for (auto &i : data) {
             Node *src = nullptr, *dest = nullptr;
@@ -127,14 +128,14 @@ class adjList {
         for (int i = 0; i < list.size(); i++) {
             fout << "[" << setw(3) << i + 1 << "] " << list[i]->ID << ": \n";
             for (int j = 0; j < list[i]->adj.size(); j++) {
-                fout << "\t(" << setw(2) << j + 1 << ") " << list[i]->adj[j].first->ID << ", " << setw(5)
+                fout << "\t(" << setw(2) << j + 1 << ") " << list[i]->adj[j].first->ID << ", " << setw(6)
                      << list[i]->adj[j].second;
                 Nodesize++;
                 if ((j + 1) % 12 == 0) fout << endl;
             }
             fout << endl;
         }
-        fout << "\n<<< There are " << Nodesize << " nodes in total. >>>" << endl;
+        fout << "<<< There are " << Nodesize << " nodes in total. >>>" << endl;
     }
 
     void printIDSize() { cout << "\n<<< There are " << IDsize << " IDs in total. >>>" << endl; }
@@ -172,32 +173,30 @@ class adjList {
         return result;
     }
 
-    /*void printTraverseAll() {
-        cout << "\n<<< There are " << IDsize << " IDs in total. >>>" << endl;
-        vector<pair<string, vector<Edge>>> result;
-        for (auto &i : list) {
-            auto bfs_result = SingleSourceBFS(i);
-            vector<Edge> tmp;
-            while (!bfs_result.empty()) {
-                tmp.push_back(bfs_result.top());
-                bfs_result.pop();
+    // modify the BFS to 2 queues, bottom-up
+    priority_queue<Edge, vector<Edge>, EdgeComparator> SingleSourceBFS2(Node *src) {
+        priority_queue<Edge, vector<Edge>, EdgeComparator> result;
+        unordered_set<Node *> visited;
+
+        queue<Node *> bfs_queue;
+        queue<Node *> bfs_queue_next;
+        bfs_queue.push(src);
+        visited.insert(src);
+
+        while (!bfs_queue.empty()) {
+            Node *current = bfs_queue.front();
+            bfs_queue.pop();
+            for (auto &i : current->adj) {
+                if (visited.count(i.first) == 0) {
+                    bfs_queue_next.push(i.first);
+                    visited.insert(i.first);
+                    result.push(i);
+                }
             }
-            result.push_back({i->ID, tmp});
+            if (bfs_queue.empty()) swap(bfs_queue, bfs_queue_next);
         }
-        /*sort(result.begin(), result.end(),
-             [](const pair<string, vector<Edge>> &i, const pair<string, vector<Edge>> &j) {
-                 if (i.second.size() == j.second.size()) return i.first < j.first;
-                 return i.second.size() > j.second.size();
-             });
-        for (int i = 0; i < result.size(); i++) {
-            cout << "[" << setw(3) << i + 1 << "] " << result[i].first << "(" << result[i].second.size()
-                 << "): \n";
-            for (int j = 0; j < result[i].second.size(); j++) {
-                cout << "\t(" << j + 1 << ") " << result[i].second[j].first->ID;
-                if ((j + 1) % 12 == 0) cout << endl;
-            }
-        }
-    }*/
+        return result;
+    }
 
     void writeTraverseAll(string filename) {
         ofstream fout(filename);
@@ -205,7 +204,7 @@ class adjList {
             result_heap;
         fout << "<<< There are " << IDsize << " IDs in total. >>>" << endl;
         for (auto &i : list) {
-            auto bfs_result = SingleSourceBFS(i);
+            auto bfs_result = SingleSourceBFS2(i);
             vector<Edge> tmp;
             while (!bfs_result.empty()) {
                 tmp.push_back(bfs_result.top());
