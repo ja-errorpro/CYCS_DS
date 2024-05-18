@@ -231,6 +231,24 @@ class adjList {
         return result;
     }
 
+    // bfs use recursive
+    void SingleSourceBFS3(Node *src, unordered_map<string, bool> &visited,
+                          priority_queue<Node *, vector<Node *>, CompareCost> &bfs_queue,
+                          set<string> &result) {
+        for (auto &i : src->adj) {
+            if (visited.count(i.first->ID) == 0) {
+                bfs_queue.push(i.first);
+                i.first->depth = src->depth + 1;
+                visited[i.first->ID] = 1;
+                result.insert(i.first->ID);
+            }
+        }
+        if (bfs_queue.empty()) return;
+        Node *current = bfs_queue.top();
+        bfs_queue.pop();
+        SingleSourceBFS3(current, visited, bfs_queue, result);
+    }
+
     void writeTraverseAll(string filename) {
         ofstream fout(filename);
         fout << "<<< There are " << IDsize << " IDs in total. >>>" << endl;
@@ -238,7 +256,7 @@ class adjList {
             result_heap;
 
         for (auto &i : edge_list) {
-            auto bfs_result = SingleSourceBFS2(i.second);
+            auto bfs_result = SingleSourceBFS(i.second);
             vector<Edge> tmp;
             while (!bfs_result.empty()) {
                 tmp.push_back(bfs_result.top());
