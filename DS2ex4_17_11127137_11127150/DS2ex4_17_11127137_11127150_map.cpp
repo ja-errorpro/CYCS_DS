@@ -19,6 +19,8 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <list>
+#include <map>
 #include <new>
 #include <queue>
 #include <sstream>
@@ -74,47 +76,54 @@ class adjList {
     int Nodesize;
 
    public:
-    vector<Node *> list;
+    // vector<Node *> list;
+    map<string, list<Node *>, less<string>> edge_list;
+
     void build(vector<StudentData> data) {
         for (auto &i : data) {
-            Node *src = nullptr, *dest = nullptr;
-            for (auto &j : list) {
-                if (j->ID == i.postID) {
-                    src = j;
-                }
-                if (j->ID == i.getID) {
-                    dest = j;
-                }
+            if (edge_list.count(i.postID) == 0) {
+                edge_list[i.postID] = list<Node *>();
+                edge_list[i.postID].push_back(new Node(i.postID));
             }
-            if (src == nullptr) {
-                src = new Node(i.postID);
-                list.push_back(src);
+            if (edge_list.count(i.getID) == 0) {
+                edge_list[i.getID] = list<Node *>();
+                edge_list[i.getID].push_back(new Node(i.getID));
             }
-            if (dest == nullptr) {
-                dest = new Node(i.getID);
-                list.push_back(dest);
-            }
-            src->addEdge(dest, i.weight);
+            edge_list[i.postID].front()->addEdge(edge_list[i.getID].front(), i.weight);
         }
-        for (auto &i : list) i->sortAdj();
-        sort(list.begin(), list.end(), [](const Node *i, const Node *j) { return i->ID < j->ID; });
-        IDsize = list.size();
+        for (auto &i : edge_list) {
+            for (auto &j : i.second) j->sortAdj();
+        }
+
+        // sort(list.begin(), list.end(), [](const Node *i, const Node *j) { return i->ID < j->ID; });
+        IDsize = edge_list.size();
     }
 
     void clear() {
-        for (auto &i : list) delete i;
-        list.clear();
+        for (auto &i : edge_list) {
+            for (auto &j : i.second) delete j;
+        }
+        edge_list.clear();
         IDsize = 0;
         Nodesize = 0;
     }
 
     void printNodes() {
         Nodesize = 0;
-        for (int i = 0; i < list.size(); i++) {
-            cout << "\n[" << i + 1 << "] " << list[i]->ID << ": \n";
+        /*for (int i = 0; i < list.size(); i++) {
+            cout << "\n[" << i + 1 << "] " << list[i]->ID << ": ";
             for (int j = 0; j < list[i]->adj.size(); j++) {
                 cout << "(" << j + 1 << ") " << list[i]->adj[j].first->ID << ", " << list[i]->adj[j].second
                      << " ";
+                Nodesize++;
+            }
+        }*/
+
+        for (auto &i : edge_list) {
+            cout << "\n[" << i.first << "] " << i.second.front()->ID << ": ";
+            for (int j = 0; j < i.second.front()->adj.size(); j++) {
+                cout << "(" << j + 1 << ") " << i.second.front()->adj[j].first->ID << ", "
+                     << i.second.front()->adj[j].second << " ";
                 Nodesize++;
             }
         }
@@ -124,7 +133,7 @@ class adjList {
         Nodesize = 0;
         ofstream fout(filename);
         fout << "<<< There are " << IDsize << " IDs in total. >>>" << endl;
-        for (int i = 0; i < list.size(); i++) {
+        /*for (int i = 0; i < list.size(); i++) {
             fout << "[" << setw(3) << i + 1 << "] " << list[i]->ID << ": \n";
             for (int j = 0; j < list[i]->adj.size(); j++) {
                 fout << "\t(" << setw(2) << j + 1 << ") " << list[i]->adj[j].first->ID << ", " << setw(5)
@@ -133,7 +142,19 @@ class adjList {
                 if ((j + 1) % 12 == 0) fout << endl;
             }
             fout << endl;
+        }*/
+        int k = 1;
+        for (auto &i : edge_list) {
+            fout << "[" << setw(3) << k++ << "] " << i.second.front()->ID << ": \n";
+            for (int j = 0; j < i.second.front()->adj.size(); j++) {
+                fout << "\t(" << setw(2) << j + 1 << ") " << i.second.front()->adj[j].first->ID << ", "
+                     << setw(5) << i.second.front()->adj[j].second;
+                Nodesize++;
+                if ((j + 1) % 12 == 0) fout << endl;
+            }
+            fout << endl;
         }
+
         fout << "\n<<< There are " << Nodesize << " nodes in total. >>>" << endl;
     }
 
@@ -172,54 +193,22 @@ class adjList {
         return result;
     }
 
-    /*void printTraverseAll() {
-        cout << "\n<<< There are " << IDsize << " IDs in total. >>>" << endl;
-        vector<pair<string, vector<Edge>>> result;
-        for (auto &i : list) {
-            auto bfs_result = SingleSourceBFS(i);
-            vector<Edge> tmp;
-            while (!bfs_result.empty()) {
-                tmp.push_back(bfs_result.top());
-                bfs_result.pop();
-            }
-            result.push_back({i->ID, tmp});
-        }
-        /*sort(result.begin(), result.end(),
-             [](const pair<string, vector<Edge>> &i, const pair<string, vector<Edge>> &j) {
-                 if (i.second.size() == j.second.size()) return i.first < j.first;
-                 return i.second.size() > j.second.size();
-             });
-        for (int i = 0; i < result.size(); i++) {
-            cout << "[" << setw(3) << i + 1 << "] " << result[i].first << "(" << result[i].second.size()
-                 << "): \n";
-            for (int j = 0; j < result[i].second.size(); j++) {
-                cout << "\t(" << j + 1 << ") " << result[i].second[j].first->ID;
-                if ((j + 1) % 12 == 0) cout << endl;
-            }
-        }
-    }*/
-
     void writeTraverseAll(string filename) {
         ofstream fout(filename);
         priority_queue<pair<string, vector<Edge>>, vector<pair<string, vector<Edge>>>, EdgeComparator>
             result_heap;
         fout << "<<< There are " << IDsize << " IDs in total. >>>" << endl;
-        for (auto &i : list) {
-            auto bfs_result = SingleSourceBFS(i);
+        for (auto &i : edge_list) {
+            auto bfs_result = SingleSourceBFS(i.second.front());
             vector<Edge> tmp;
             while (!bfs_result.empty()) {
                 tmp.push_back(bfs_result.top());
                 bfs_result.pop();
             }
-            result_heap.push({i->ID, tmp});
+            result_heap.push({i.first, tmp});
         }
-        /*sort(result.begin(), result.end(),
-             [](const pair<string, vector<Edge>> &i, const pair<string, vector<Edge>> &j) {
-                 if (i.second.size() == j.second.size()) return i.first < j.first;
-                 return i.second.size() > j.second.size();
-             });*/
-        vector<pair<string, vector<Edge>>> result;
-        while (!result_heap.empty()) {
+        /*vector<pair<string, vector<Edge>>> result;
+        while (!result_heap.empty()) { // convert heap to vector
             result.push_back(result_heap.top());
             result_heap.pop();
         }
@@ -228,6 +217,18 @@ class adjList {
                  << "): \n";
             for (int j = 0; j < result[i].second.size(); j++) {
                 fout << "\t(" << setw(2) << j + 1 << ") " << result[i].second[j].first->ID;
+                if ((j + 1) % 12 == 0) fout << endl;
+            }
+            fout << endl;
+        }*/
+
+        int k = 1;
+        while (!result_heap.empty()) {
+            auto i = result_heap.top();
+            result_heap.pop();
+            fout << "[" << setw(3) << k++ << "] " << i.first << "(" << i.second.size() << "): \n";
+            for (int j = 0; j < i.second.size(); j++) {
+                fout << "\t(" << setw(2) << j + 1 << ") " << i.second[j].first->ID;
                 if ((j + 1) % 12 == 0) fout << endl;
             }
             fout << endl;
@@ -305,7 +306,7 @@ class FileHandler {
         graph.writeTraverseAll(output_file_name);
         auto end = chrono::high_resolution_clock::now();
         chrono::duration<double> elapsed = end - start;
-        // cerr << "Time: " << chrono::duration_cast<chrono::milliseconds>(elapsed).count() << " ms\n";
+        cerr << "Time: " << chrono::duration_cast<chrono::milliseconds>(elapsed).count() << " ms\n";
     }
 };
 
