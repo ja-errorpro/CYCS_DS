@@ -354,7 +354,7 @@ class adjList {
             list<string> tmp(dfs_result.begin(), dfs_result.end());
             result_heap.push({i.first, tmp});
         }
-
+        cout << "\n<<< There are " << result_heap.size() << " IDs in total. >>>" << endl;
         fout << "<<< There are " << result_heap.size() << " IDs in total. >>>" << endl;
         int k = 1;
         while (!result_heap.empty()) {
@@ -458,7 +458,7 @@ class FileHandler {
         float threshold;
         cout << "\nInput a real number in [0.5,1]: ";
         cin >> threshold;
-        while (threshold - 0.5 < OFFSET || threshold - 1 > OFFSET) {
+        while (threshold - 0.5 + OFFSET < 0 || threshold - 1 > OFFSET) {
             cout << "\n### It is NOT in [0.5,1] ###\n";
             cout << "\nInput a real number in [0.5,1]: ";
             cin >> threshold;
