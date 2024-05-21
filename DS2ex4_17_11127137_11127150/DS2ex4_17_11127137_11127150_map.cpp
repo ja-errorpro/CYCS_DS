@@ -23,8 +23,10 @@
 #include <map>
 #include <new>
 #include <queue>
+#include <random>
 #include <set>
 #include <sstream>
+#include <stack>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -35,6 +37,7 @@
 using namespace std;
 
 #define endl '\n'
+#define OFFSET 1e-6
 
 #define CompileErr0r_is_the_weakest_hacker ios_base::sync_with_stdio(0);
 
@@ -59,8 +62,7 @@ struct Node {
     string ID;
     vector<Edge> adj;
     int Nodesize;
-    int depth;
-    Node(string ID) : ID(ID), Nodesize(0), depth(0) {}
+    Node(string ID) : ID(ID), Nodesize(0) {}
 
     void addEdge(Node *dest, float weight) {
         adj.push_back({dest, weight});
@@ -68,7 +70,10 @@ struct Node {
     }
 
     void sortAdj() {
-        sort(adj.begin(), adj.end(), [](const Edge &i, const Edge &j) { return i.first->ID < j.first->ID; });
+        // sort(adj.begin(), adj.end(), [](const Edge &i, const Edge &j) { return i.first->ID < j.first->ID;
+        // });
+        stable_sort(adj.begin(), adj.end(),
+                    [](const Edge &i, const Edge &j) { return i.first->ID < j.first->ID; });
     }
 };
 
@@ -168,7 +173,7 @@ class adjList {
             if (i.second.size() == j.second.size()) return i.first > j.first;
             return i.second.size() < j.second.size();
         }
-        bool operator()(const pair<string, vector<string>> &i, const pair<string, vector<string>> &j) {
+        bool operator()(const pair<string, list<string>> &i, const pair<string, list<string>> &j) {
             if (i.second.size() == j.second.size()) return i.first > j.first;
             return i.second.size() < j.second.size();
         }
@@ -197,82 +202,219 @@ class adjList {
         return result;
     }
 
-    struct CompareCost {
-        bool operator()(const Node *a, const Node *b) { return a->depth < b->depth; }
-        bool operator()(const priority_queue<string, vector<string>, greater<string>> &a,
-                        const priority_queue<string, vector<string>, greater<string>> &b) {
-            return a.size() < b.size();
-        }
-    };
+    unordered_map<string, unordered_set<string>> result_map; // for memory optimization
+    set<string, less<string>> SingleSourceBFS2(Node *src) {
+        // priority_queue<string, vector<string>, greater<string>> result;
+        set<string, less<string>> result_set;
 
-    // use priority queue
-    priority_queue<Edge, vector<Edge>, EdgeComparator> SingleSourceBFS2(Node *src) {
-        priority_queue<Edge, vector<Edge>, EdgeComparator> result;
-        unordered_map<string, bool> visited;
+        unordered_set<string> visited;
+        deque<string> bfs_queue;
+        bfs_queue.push_back(src->ID);
+        visited.insert(src->ID);
+        while (!bfs_queue.empty()) {
+            string current = bfs_queue.front();
+            bfs_queue.pop_front();
 
-        priority_queue<Node *, vector<Node *>, CompareCost> bfs_first_queue;
-        bfs_first_queue.push(src);
-        visited[src->ID] = 1;
-
-        while (!bfs_first_queue.empty()) {
-            Node *current = bfs_first_queue.top();
-
-            bfs_first_queue.pop();
-            for (auto &i : current->adj) {
+            if (result_map[src->ID].count(current) == 0) {
+                for (auto &i : result_map[current]) { // add previous result
+                    visited.insert(i);
+                    result_set.insert(i);
+                    result_map[src->ID].insert(i);
+                }
+                for (auto &i : result_map[current]) { // search unvisited nodes
+                    for (auto &j : edge_list[i]->adj) {
+                        if (result_map[i].count(j.first->ID) == 0) continue;
+                        // cerr << "current: " << current << " i: " << i << " j: " << j.first->ID << endl;
+                        result_map[i].insert(j.first->ID);
+                        if (visited.count(j.first->ID) == 0) {
+                            bfs_queue.push_back(i);
+                            break;
+                        }
+                    }
+                }
+            }
+            for (auto &i : edge_list[current]->adj) {
                 if (visited.count(i.first->ID) == 0) {
-                    bfs_first_queue.push(i.first);
-                    i.first->depth = current->depth + 1;
-                    visited[i.first->ID] = 1;
-                    result.push(i);
+                    for (auto &j : result_map[i.first->ID]) {
+                        result_map[current].insert(j);
+                        result_map[src->ID].insert(j);
+                        visited.insert(j);
+                        result_set.insert(j);
+                    }
+                    if (result_map[i.first->ID].empty()) bfs_queue.push_back(i.first->ID);
+                    visited.insert(i.first->ID);
+                    result_map[current].insert(i.first->ID);
+                    result_map[src->ID].insert(i.first->ID);
+                    result_set.insert(i.first->ID);
                 }
             }
         }
 
-        return result;
+        result_set.erase(src->ID);
+
+        return result_set;
     }
 
-    // bfs use recursive
-    void SingleSourceBFS3(Node *src, unordered_map<string, bool> &visited,
-                          priority_queue<Node *, vector<Node *>, CompareCost> &bfs_queue,
-                          set<string> &result) {
-        for (auto &i : src->adj) {
-            if (visited.count(i.first->ID) == 0) {
-                bfs_queue.push(i.first);
-                i.first->depth = src->depth + 1;
-                visited[i.first->ID] = 1;
-                result.insert(i.first->ID);
+    map<pair<string, string>, float> edge_threshold_map;
+
+    set<string, less<string>> SingleSourceDFS(Node *src, float threshold, bool random_threshold = false) {
+        // priority_queue<string, vector<string>, greater<string>> result;
+        set<string, less<string>> result_set;
+
+        unordered_set<string> visited;
+        stack<string> dfs_stack;
+        dfs_stack.push(src->ID);
+        visited.insert(src->ID);
+        while (!dfs_stack.empty()) {
+            string current = dfs_stack.top();
+            dfs_stack.pop();
+
+            if (result_map[src->ID].count(current) == 0) {
+                for (auto &i : result_map[current]) { // add previous result
+                    visited.insert(i);
+                    result_set.insert(i);
+                    result_map[src->ID].insert(i);
+                }
+                for (auto &i : result_map[current]) { // search unvisited nodes
+                    for (auto &j : edge_list[i]->adj) {
+                        if (result_map[i].count(j.first->ID) == 0) continue;
+                        float edge_threshold = threshold;
+                        if (random_threshold) { // use randomed threshold
+                            if (edge_threshold_map.count({i, j.first->ID}) == 0) {
+                                random_device rd;
+                                mt19937 gen(rd());
+                                uniform_real_distribution<float> dis(0.8, 1);
+                                edge_threshold_map[{i, j.first->ID}] = dis(gen);
+                            }
+                            edge_threshold = edge_threshold_map[{i, j.first->ID}];
+                        }
+                        if (visited.count(j.first->ID) == 0 && j.second >= edge_threshold) {
+                            dfs_stack.push(i);
+                            break;
+                        }
+                    }
+                }
+            }
+            for (auto &i : edge_list[current]->adj) {
+                float edge_threshold = threshold;
+                if (random_threshold) { // use randomed threshold
+                    if (edge_threshold_map.count({current, i.first->ID}) == 0) {
+                        random_device rd;
+                        mt19937 gen(rd());
+                        uniform_real_distribution<float> dis(0.8, 1);
+                        edge_threshold_map[{current, i.first->ID}] = dis(gen);
+                    }
+                    edge_threshold = edge_threshold_map[{current, i.first->ID}];
+                }
+                if (visited.count(i.first->ID) == 0 && i.second >= edge_threshold) {
+                    for (auto &j : result_map[i.first->ID]) {
+                        result_map[current].insert(j);
+                        result_map[src->ID].insert(j);
+                        visited.insert(j);
+                        result_set.insert(j);
+                    }
+                    if (result_map[i.first->ID].empty()) dfs_stack.push(i.first->ID);
+                    visited.insert(i.first->ID);
+                    result_map[current].insert(i.first->ID);
+                    result_map[src->ID].insert(i.first->ID);
+                    result_set.insert(i.first->ID);
+                }
             }
         }
-        if (bfs_queue.empty()) return;
-        Node *current = bfs_queue.top();
-        bfs_queue.pop();
-        SingleSourceBFS3(current, visited, bfs_queue, result);
+
+        result_set.erase(src->ID);
+
+        return result_set;
     }
 
     void writeTraverseAll(string filename) {
+        result_map.clear();
         ofstream fout(filename);
         fout << "<<< There are " << IDsize << " IDs in total. >>>" << endl;
-        priority_queue<pair<string, vector<Edge>>, vector<pair<string, vector<Edge>>>, EdgeComparator>
+        priority_queue<pair<string, list<string>>, vector<pair<string, list<string>>>, EdgeComparator>
             result_heap;
-
+        for (auto &i : edge_list) result_map[i.first] = {};
+        auto start = chrono::high_resolution_clock::now();
         for (auto &i : edge_list) {
-            auto bfs_result = SingleSourceBFS(i.second);
-            vector<Edge> tmp;
-            while (!bfs_result.empty()) {
-                tmp.push_back(bfs_result.top());
-                bfs_result.pop();
-            }
+            auto bfs_result = SingleSourceBFS2(i.second);
+            list<string> tmp(bfs_result.begin(), bfs_result.end());
             result_heap.push({i.first, tmp});
         }
-
+        auto end = chrono::high_resolution_clock::now();
+        chrono::duration<double> elapsed = end - start;
+        cerr << "Traverse Time: " << chrono::duration_cast<chrono::milliseconds>(elapsed).count() << " ms\n";
         int k = 1;
         while (!result_heap.empty()) {
             auto i = result_heap.top();
             result_heap.pop();
             fout << "[" << setw(3) << k++ << "] " << i.first << "(" << i.second.size() << "): \n";
-            for (int j = 0; j < i.second.size(); j++) {
-                fout << "\t(" << setw(2) << j + 1 << ") " << i.second[j].first->ID;
+            /*for (int j = 0; j < i.second.size(); j++) {
+                fout << "\t(" << setw(2) << j + 1 << ") " << i.second.front();
                 if ((j + 1) % 12 == 0) fout << endl;
+            }*/
+            int j = 0;
+            for (auto &l : i.second) {
+                fout << "\t(" << setw(2) << j + 1 << ") " << l;
+                if ((j + 1) % 12 == 0) fout << endl;
+                j++;
+            }
+            fout << endl;
+        }
+    }
+
+    void writeTraverseWithThreshold(string filename, float threshold, bool output_topK = false) {
+        result_map.clear();
+        edge_threshold_map.clear();
+        priority_queue<pair<string, list<string>>, vector<pair<string, list<string>>>, EdgeComparator>
+            result_heap;
+        for (auto &i : edge_list) result_map[i.first] = {};
+        auto start = chrono::high_resolution_clock::now();
+        for (auto &i : edge_list) {
+            auto dfs_result = SingleSourceDFS(i.second, threshold, output_topK);
+            if (dfs_result.empty()) continue;
+            list<string> tmp(dfs_result.begin(), dfs_result.end());
+            result_heap.push({i.first, tmp});
+        }
+        auto end = chrono::high_resolution_clock::now();
+        chrono::duration<double> elapsed = end - start;
+        if (output_topK) {
+            cout << "\n[Elapsed time] " << chrono::duration_cast<chrono::milliseconds>(elapsed).count()
+                 << " ms\n";
+            cout << "\nInput an integer to show top-K in [1," << result_heap.size() << "]: ";
+            int topK;
+            cin >> topK;
+            while (topK < 1 || topK > result_heap.size()) {
+                cout << "\n### " << topK << " is NOT in [1," << result_heap.size() << "] ###\n";
+                cout << "\nInput an integer to show top-K in [1," << result_heap.size() << "]: ";
+                cin >> topK;
+            }
+            int k = 1;
+            while (!result_heap.empty() && k <= topK) {
+                auto i = result_heap.top();
+                result_heap.pop();
+                cout << "<" << setw(3) << k++ << "> " << i.first << ": " << i.second.size();
+
+                cout << endl;
+            }
+            return;
+        }
+        ofstream fout(filename);
+        cout << "\n<<< There are " << result_heap.size() << " IDs in total. >>>" << endl;
+        fout << "<<< There are " << result_heap.size() << " IDs in total. >>>" << endl;
+        int k = 1;
+        while (!result_heap.empty()) {
+            auto i = result_heap.top();
+            result_heap.pop();
+            fout << "[" << setw(3) << k++ << "] " << i.first << "(" << i.second.size() << "): \n";
+            /*for (int j = 0; j < i.second.size(); j++) {
+                fout << "\t(" << setw(2) << j + 1 << ") " << i.second.front();
+                if ((j + 1) % 12 == 0) fout << endl;
+            }*/
+            int j = 0;
+            for (auto &l : i.second) {
+                fout << "\t(" << setw(2) << j + 1 << ") " << l;
+                if ((j + 1) % 12 == 0) fout << endl;
+                j++;
             }
             fout << endl;
         }
@@ -352,8 +494,25 @@ class FileHandler {
         graph.writeTraverseAll(output_file_name);
         auto end = chrono::high_resolution_clock::now();
         chrono::duration<double> elapsed = end - start;
-        // cerr << "Time: " << chrono::duration_cast<chrono::milliseconds>(elapsed).count() << " ms\n";
+        cerr << "Traverse + Write File Time: " << chrono::duration_cast<chrono::milliseconds>(elapsed).count()
+             << " ms\n";
     }
+
+    void TraverseWithThreshold() {
+        string output_file_name = "pairs" + file_number + ".inf";
+        float threshold;
+        cout << "\nInput a real number in [0.5,1]: ";
+        cin >> threshold;
+        while (threshold - 0.5 + OFFSET < 0 || threshold - 1 > OFFSET) {
+            cout << "\n### It is NOT in [0.5,1] ###\n";
+            cout << "\nInput a real number in [0.5,1]: ";
+            cin >> threshold;
+        }
+
+        graph.writeTraverseWithThreshold(output_file_name, threshold);
+    }
+
+    void TraverseWithRandomThreshold() { graph.writeTraverseWithThreshold("No File OUTPUT!!!", -999, true); }
 };
 
 class Solution {
@@ -375,14 +534,31 @@ class Solution {
         }
         fileHandler.TraverseGraph();
     }
+    void case3() {
+        if (fileHandler.isEmpty()) {
+            cout << "\n### There is no graph and choose 1 first. ###" << endl;
+            return;
+        }
+        fileHandler.TraverseWithThreshold();
+    }
+
+    void case4() {
+        if (fileHandler.isEmpty()) {
+            cout << "\n### There is no graph and choose 1 first. ###" << endl;
+            return;
+        }
+        fileHandler.TraverseWithRandomThreshold();
+    }
 };
 void WriteMenu() {
     cout << "\n**** Graph data manipulation *****"
             "\n* 0. QUIT                        *"
             "\n* 1. Build adjacency lists       *"
             "\n* 2. Compute connection counts   *"
+            "\n* 3. Estimate influence values   *"
+            "\n* 4. Probability-based influence *"
             "\n**********************************"
-            "\nInput a choice(0, 1, 2): ";
+            "\nInput a choice(0, 1, 2, 3, 4): ";
 }
 
 signed main() {
@@ -397,6 +573,10 @@ signed main() {
             sol.case1();
         } else if (command == "2") {
             sol.case2();
+        } else if (command == "3") {
+            sol.case3();
+        } else if (command == "4") {
+            sol.case4();
         } else
             cout << "\nCommand does not Exist!!!" << endl;
         WriteMenu();
