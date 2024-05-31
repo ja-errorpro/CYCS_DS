@@ -49,12 +49,18 @@ struct StudentData {
     StudentData() : weight(0) {}
 };
 
+struct PrimaryIndex {
+    float weight;
+    int offset;
+    PrimaryIndex() : weight(0), offset(0) {}
+};
+
 class FileHandler {
    private:
     string input_file_name;
     string file_number;
     vector<StudentData> partial_student_data;
-
+    vector<PrimaryIndex> primary_index;
     int split_count;
 
    public:
@@ -63,6 +69,7 @@ class FileHandler {
     FileHandler() : split_count(0), internal_sort_duration(0), external_sort_duration(0) {}
     ~FileHandler() { clear(); }
     void clear() {
+        primary_index.clear();
         input_file_name.clear();
         file_number.clear();
         partial_student_data.clear();
@@ -292,17 +299,46 @@ class FileHandler {
 
     void printOffset() {
         ifstream fin("ordered" + file_number + ".bin", ios::binary);
-        StudentData student;
+
         int offset = 0;
         int count = 0;
         float prev_weight = -1;
-        while (fin.read((char *)&student, sizeof(StudentData))) {
+        StudentData *student = new StudentData[MAX_BUFFER_SIZE];
+
+        // read the first block
+        fin.read((char *)student, MAX_BUFFER_SIZE * sizeof(StudentData));
+        int block_count = 0;
+        while (!fin.eof()) {
+            for (int i = 0; i < MAX_BUFFER_SIZE; i++) {
+                // cerr << student[i].weight << endl;
+                if (count == 0 || fabs(student[i].weight - prev_weight) > 1e-6) {
+                    PrimaryIndex index;
+                    index.weight = student[i].weight;
+                    index.offset = offset;
+                    primary_index.push_back(index);
+                    prev_weight = student[i].weight;
+                    count++;
+                }
+                offset = 1 + i + block_count * MAX_BUFFER_SIZE;
+            }
+            block_count++;
+            fin.read((char *)student, MAX_BUFFER_SIZE * sizeof(StudentData));
+        }
+        // print the primary index
+        for (int i = 0; i < primary_index.size(); i++) {
+            cout << "\n[" << i + 1 << "] (" << primary_index[i].weight << ", " << primary_index[i].offset
+                 << ")";
+        }
+        /*while (fin.read((char *)&student, sizeof(StudentData))) {
             if (count == 0 || fabs(student.weight - prev_weight) > 1e-6) {
                 cout << "\n[" << ++count << "] (" << student.weight << ", " << offset << ")";
             }
             prev_weight = student.weight;
             offset = fin.tellg() / sizeof(StudentData);
-        }
+        }*/
+
+        delete[] student;
+
         cout << endl;
         fin.close();
     }

@@ -28,9 +28,9 @@ Now there are 2 runs.
 Now there are 1 runs.
 
 The execution time ...
-Internal Sort = 12.295 ms
-External Sort = 30.875 ms
-Total Execution Time = 43.170 ms
+Internal Sort = 2.973 ms
+External Sort = 10.217 ms
+Total Execution Time = 13.190 ms
 
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -172,9 +172,9 @@ Now there are 2 runs.
 Now there are 1 runs.
 
 The execution time ...
-Internal Sort = 15.215 ms
-External Sort = 35.420 ms
-Total Execution Time = 50.635 ms
+Internal Sort = 3.243 ms
+External Sort = 10.980 ms
+Total Execution Time = 14.223 ms
 
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -316,9 +316,9 @@ Now there are 2 runs.
 Now there are 1 runs.
 
 The execution time ...
-Internal Sort = 14.598 ms
-External Sort = 37.630 ms
-Total Execution Time = 52.228 ms
+Internal Sort = 4.617 ms
+External Sort = 14.760 ms
+Total Execution Time = 19.377 ms
 
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -460,9 +460,9 @@ Now there are 2 runs.
 Now there are 1 runs.
 
 The execution time ...
-Internal Sort = 18.017 ms
-External Sort = 46.332 ms
-Total Execution Time = 64.349 ms
+Internal Sort = 4.893 ms
+External Sort = 15.933 ms
+Total Execution Time = 20.826 ms
 
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -606,9 +606,9 @@ Now there are 2 runs.
 Now there are 1 runs.
 
 The execution time ...
-Internal Sort = 36.309 ms
-External Sort = 85.469 ms
-Total Execution Time = 121.778 ms
+Internal Sort = 6.405 ms
+External Sort = 23.873 ms
+Total Execution Time = 30.278 ms
 
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -754,9 +754,9 @@ Now there are 2 runs.
 Now there are 1 runs.
 
 The execution time ...
-Internal Sort = 65.108 ms
-External Sort = 164.492 ms
-Total Execution Time = 229.600 ms
+Internal Sort = 11.755 ms
+External Sort = 45.641 ms
+Total Execution Time = 57.396 ms
 
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
