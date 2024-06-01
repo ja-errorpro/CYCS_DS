@@ -19,13 +19,13 @@ echo "===================="
 for i in ${file_num[@]};
 do
     echo "正在測試: $i"
-    DIFF1=$(diff ordered$i.bin ordered"$i"_ans.bin)
+    DIFF1=$(diff order$i.bin ordered"$i"_ans.bin)
     result=$((result + $?))
     if [ $result -ne 0 ]; then
         echo "WA"
         echo "$DIFF1"
     fi
-    DIFF2=$(diff ordered$i.bin ordered"$i"_ans.bin)
+    DIFF2=$(diff order$i.bin ordered"$i"_ans.bin)
     if [ $result -ne 0 ]; then
         echo "WA"
         echo "$DIFF2"
