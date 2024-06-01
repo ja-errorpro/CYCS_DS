@@ -249,6 +249,7 @@ class FileHandler {
         external_sort_duration = 0;
         cout << "\nNow there are " << file_name.size() << " runs." << endl;
         int level = 1;
+        remove(("order" + file_number + ".bin").c_str());
         while (file_name.size() > 1) {
             vector<string> new_file_name;
             for (int i = 0; i < file_name.size(); i += 2) {
@@ -258,8 +259,8 @@ class FileHandler {
                     string t = "merging";
                     int buffer_size = level * MAX_BUFFER_SIZE;
                     auto start = chrono::high_resolution_clock::now();
-                    // twoWayMergeFile(l, r, t);
-                    twoWayMergeFileBuffer(l, r, t, buffer_size);
+                    twoWayMergeFile(l, r, t);
+                    // twoWayMergeFileBuffer(l, r, t, buffer_size);
                     auto end = chrono::high_resolution_clock::now();
                     int64_t duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
                     external_sort_duration += duration;
@@ -278,13 +279,13 @@ class FileHandler {
             file_name = new_file_name;
             cout << "\nNow there are " << file_name.size() << " runs." << endl;
         }
-        rename(("tmp_" + file_number + "_" + file_name[0]).c_str(),
-               ("sorted" + file_number + ".bin").c_str());
-        /*
-        ifstream fin("tmp_" + file_name[0], ios::binary);
+        rename(("tmp_" + file_name[0]).c_str(), ("order" + file_number + ".bin").c_str());
+
+        /*ifstream fin("tmp_" + file_name[0], ios::binary);
         // cerr << file_name[0] << endl;
-        // assert(fin.is_open());
-        ofstream fout("ordered" + file_number + ".bin", ios::binary);
+        assert(fin.is_open());
+        ofstream fout("order" + file_number + ".bin", ios::binary);
+        assert(fout.is_open());
         StudentData student;
         while (fin.read((char *)&student, sizeof(StudentData))) {
             fout.write((char *)&student, sizeof(StudentData));
@@ -294,11 +295,11 @@ class FileHandler {
         for (auto &file : all_file) {
             remove(("tmp_" + file).c_str());
         }
-        // remove(("tmp_" + file_name[0]).c_str());
+        remove(("tmp_" + file_name[0]).c_str());
     }
 
     void printOffset() {
-        ifstream fin("ordered" + file_number + ".bin", ios::binary);
+        ifstream fin("order" + file_number + ".bin", ios::binary);
 
         int offset = 0;
         int count = 0;
