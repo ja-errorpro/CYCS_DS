@@ -1,4 +1,4 @@
-// 11127137, 黃乙家
+// 11127137, 黃乙家, 11127150, 張睿恩
 /****************************************************/
 /*  CPP Template for School                         */
 /*  Author: CompileErr0r(YiJia)                     */
@@ -118,6 +118,14 @@ class FileHandler {
         if (file_size % (MAX_BUFFER_SIZE * sizeof(StudentData)) != 0) split_count++;
     }
 
+    int getFileSize(string file_name) {
+        ifstream fin(file_name, ios::binary);
+        fin.seekg(0, ios::end);
+        int file_size = fin.tellg();
+        fin.close();
+        return file_size;
+    }
+
     void floatRadixSort(vector<StudentData> &data) {
         for (int i = 0; i < data.size(); ++i) {
             reinterpret_cast<int &>(data[i].weight) = reinterpret_cast<int &>(data[i].weight) | 0x80000000;
@@ -197,46 +205,59 @@ class FileHandler {
     }
 
     void twoWayMergeFileBuffer(string left_file, string right_file, string tmp_file, int buffer_size) {
+        int l_size = getFileSize("tmp_" + left_file) / sizeof(StudentData);
+        int r_size = getFileSize("tmp_" + right_file) / sizeof(StudentData);
         ifstream left_fin("tmp_" + left_file, ios::binary);
         ifstream right_fin("tmp_" + right_file, ios::binary);
         ofstream fout("tmp_" + tmp_file, ios::binary);
         StudentData *left_student = new StudentData[buffer_size];
         StudentData *right_student = new StudentData[buffer_size];
-        StudentData *out_student = new StudentData[buffer_size * 2];
+        StudentData *output_student = new StudentData[buffer_size];
         left_fin.read((char *)left_student, buffer_size * sizeof(StudentData));
         right_fin.read((char *)right_student, buffer_size * sizeof(StudentData));
-        int l = 0, r = 0;
-        int out = 0;
-        while (l < buffer_size && r < buffer_size) {
-            if (left_student[l].weight >= right_student[r].weight) {
-                out_student[out] = left_student[l];
-                l++;
-
+        int l_index = 0, r_index = 0, o_index = 0;
+        while (l_index < l_size && r_index < r_size) {
+            if (left_student[l_index].weight >= right_student[r_index].weight) {
+                output_student[o_index++] = left_student[l_index++];
             } else {
-                out_student[out] = right_student[r];
-                r++;
+                output_student[o_index++] = right_student[r_index++];
             }
-            out++;
+            if (o_index == buffer_size) {
+                fout.write((char *)output_student, buffer_size * sizeof(StudentData));
+                o_index = 0;
+            }
+            if (l_index == buffer_size) {
+                left_fin.read((char *)left_student, buffer_size * sizeof(StudentData));
+                l_index = 0;
+            }
+            if (r_index == buffer_size) {
+                right_fin.read((char *)right_student, buffer_size * sizeof(StudentData));
+                r_index = 0;
+            }
         }
-        while (l < buffer_size) {
-            out_student[out] = left_student[l];
-            l++;
-            out++;
+        while (l_index < l_size) {
+            output_student[o_index++] = left_student[l_index++];
+            if (o_index == buffer_size) {
+                fout.write((char *)output_student, buffer_size * sizeof(StudentData));
+                o_index = 0;
+            }
         }
-        while (r < buffer_size) {
-            out_student[out] = right_student[r];
-            r++;
-            out++;
+        while (r_index < r_size) {
+            output_student[o_index++] = right_student[r_index++];
+            if (o_index == buffer_size) {
+                fout.write((char *)output_student, buffer_size * sizeof(StudentData));
+                o_index = 0;
+            }
         }
-        if (out > 0) {
-            fout.write((char *)out_student, out * sizeof(StudentData));
+        if (o_index > 0) {
+            fout.write((char *)output_student, o_index * sizeof(StudentData));
         }
-        delete[] left_student;
-        delete[] right_student;
-        delete[] out_student;
         left_fin.close();
         right_fin.close();
         fout.close();
+        delete[] left_student;
+        delete[] right_student;
+        delete[] output_student;
     }
 
     void mergeFile() {
@@ -257,14 +278,15 @@ class FileHandler {
                     string l = file_name[i];
                     string r = file_name[i + 1];
                     string t = "merging";
-                    int buffer_size = level * MAX_BUFFER_SIZE;
+                    int buffer_size = MAX_BUFFER_SIZE * (1 << level);
                     auto start = chrono::high_resolution_clock::now();
-                    twoWayMergeFile(l, r, t);
-                    // twoWayMergeFileBuffer(l, r, t, buffer_size);
+                    // twoWayMergeFile(l, r, t);
+                    twoWayMergeFileBuffer(l, r, t, buffer_size);
                     auto end = chrono::high_resolution_clock::now();
                     int64_t duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
                     external_sort_duration += duration;
                     remove(("tmp_" + l).c_str());
+
                     rename(("tmp_" + t).c_str(), ("tmp_" + l).c_str());
                     remove(("tmp_" + t).c_str());
                     t = l;
