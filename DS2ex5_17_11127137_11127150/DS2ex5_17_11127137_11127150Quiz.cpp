@@ -477,8 +477,8 @@ class FileHandler {
                 fin.read((char *)&student, sizeof(StudentData));
                 string line;
                 stringstream ss;
-                ss << "[" << index.offset + 1 << "] " << student.postID << " " << student.getID << " "
-                   << student.weight;
+                ss << "[" << setw(2) << index.offset + 1 << "] " << student.postID << " " << student.getID
+                   << " " << student.weight;
                 getline(ss, line);
                 out_buffer.push_back(line);
                 /*fout << setw(3) << "[" << index.offset + 1 << "] " << setw(5) << student.postID << " "
