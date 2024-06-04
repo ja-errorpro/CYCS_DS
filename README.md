@@ -61,3 +61,14 @@ $$ hash(key) = \Pi student[0..|student|-1] \% tableSize $$
 maxStep = 比 dataSize / 5 大的最小質數。
 
 $$ step = maxStep - ( \Pi student[0..|student|-1] \% maxStep) $$
+
+## 作業四 [Source Code](./DS2ex4_17_11127137_11127150/DS2ex4_17_11127137_11127150Quiz.cpp)
+* 任務一：給定 (u, v) 以及權重 w，以 Adj List 建立有向圖，list 上的節點需由小到大排序，list 需由大到小排序。
+* 任務二：以 BFS 找出每個節點可以到達的節點。
+* 任務三：以 DFS 找出權重不小於輸入門檻值，每個節點可以到達的節點。
+* 任務四：以 BFS 或 DFS 找出權重不小於隨機門檻值，每個節點可以到達的節點，每個 Edge 的門檻在整個執行過程只隨機一次，並依可到達節點數排序後找出前 K 大的節點。
+
+## 作業五 [Source Code](./DS2ex5_17_11127137_11127150/DS2ex5_17_11127137_11127150Quiz.cpp)
+* 任務一：以外部排序法將資料排序，並以二路合併排序法合併，其中 buffer size 指定為 300。
+* 任務二：對權重相等的資料建立 Primary Index，紀錄權重值與資料偏移位置。
+* 任務三：使 buffer size 可變，做完任務一、二後找到權重不小於輸入門檻值的資料。

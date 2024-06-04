@@ -60,7 +60,7 @@ struct StudentData {
 
 struct Node {
     string ID;
-    vector<Edge> adj;
+    deque<Edge> adj;
     int Nodesize;
     Node(string ID) : ID(ID), Nodesize(0) {}
 
@@ -331,7 +331,7 @@ class adjList {
         result_map.clear();
         ofstream fout(filename);
         fout << "<<< There are " << IDsize << " IDs in total. >>>" << endl;
-        priority_queue<pair<string, list<string>>, vector<pair<string, list<string>>>, EdgeComparator>
+        priority_queue<pair<string, list<string>>, deque<pair<string, list<string>>>, EdgeComparator>
             result_heap;
         for (auto &i : edge_list) result_map[i.first] = {};
         auto start = chrono::high_resolution_clock::now();
@@ -365,7 +365,7 @@ class adjList {
     void writeTraverseWithThreshold(string filename, float threshold, bool output_topK = false) {
         result_map.clear();
         edge_threshold_map.clear();
-        priority_queue<pair<string, list<string>>, vector<pair<string, list<string>>>, EdgeComparator>
+        priority_queue<pair<string, list<string>>, deque<pair<string, list<string>>>, EdgeComparator>
             result_heap;
         for (auto &i : edge_list) result_map[i.first] = {};
         auto start = chrono::high_resolution_clock::now();
