@@ -165,7 +165,7 @@ class FileHandler {
         reverse(data.begin(), data.end());
     }
 
-    void splitData() {
+    /*void splitData() {
         ifstream fin(input_file_name, ios::binary);
         calculateSplitCount();
         internal_sort_duration = 0;
@@ -188,11 +188,11 @@ class FileHandler {
             writePartialSortedData(i);
         }
         fin.close();
-    }
+    }*/
 
     void splitData(int buffer_size) {
         ifstream fin(input_file_name, ios::binary);
-        calculateSplitCount();
+        calculateSplitCount(buffer_size);
         internal_sort_duration = 0;
         for (int i = 0; i < split_count; i++) {
             partial_student_data.clear();
@@ -300,7 +300,7 @@ class FileHandler {
         delete[] output_student;
     }
 
-    void mergeFile() {
+    /*void mergeFile() {
         vector<string> file_name;
         set<string> all_file;
         for (int i = 0; i < split_count; i++) {
@@ -353,12 +353,12 @@ class FileHandler {
             fout.write((char *)&student, sizeof(StudentData));
         }
         fin.close();
-        fout.close();*/
+        fout.close();
         for (auto &file : all_file) {
             remove(("tmp_" + file).c_str());
         }
         remove(("tmp_" + file_name[0]).c_str());
-    }
+    }*/
 
     void mergeFile(int buffer_size) {
         vector<string> file_name;
@@ -426,13 +426,16 @@ class FileHandler {
         int offset = 0;
         int count = 0;
         float prev_weight = -1;
-        StudentData *student = new StudentData[MAX_BUFFER_SIZE];
+        int file_size = getFileSize("order" + file_number + ".bin");
+        int buffer_size = min(custom_buffer_size, file_size / (int)sizeof(StudentData));
+        StudentData *student = new StudentData[buffer_size];
 
         // read the first block
-        fin.read((char *)student, MAX_BUFFER_SIZE * sizeof(StudentData));
+        fin.read((char *)student, buffer_size * sizeof(StudentData));
         int block_count = 0;
+
         while (!fin.eof()) {
-            for (int i = 0; i < MAX_BUFFER_SIZE; i++) {
+            for (int i = 0; i < buffer_size; i++) {
                 // cerr << student[i].weight << endl;
                 if (count == 0 || fabs(student[i].weight - prev_weight) > 1e-6) {
                     PrimaryIndex index;
@@ -442,10 +445,10 @@ class FileHandler {
                     prev_weight = student[i].weight;
                     count++;
                 }
-                offset = 1 + i + block_count * MAX_BUFFER_SIZE;
+                offset = 1 + i + block_count * buffer_size;
             }
             block_count++;
-            fin.read((char *)student, MAX_BUFFER_SIZE * sizeof(StudentData));
+            fin.read((char *)student, buffer_size * sizeof(StudentData));
         }
         // print the primary index
         for (int i = 0; i < primary_index.size(); i++) {
@@ -544,12 +547,12 @@ class Solution {
         }
         if (read_result == -2) return;
         // auto start = chrono::high_resolution_clock::now();
-        fileHandler.splitData();
+        fileHandler.splitData(fileHandler.custom_buffer_size);
         cout << "\nThe internal sort is completed. Check the initial sorted runs!" << endl;
         // auto end = chrono::high_resolution_clock::now();
         // int64_t split_duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
         // start = chrono::high_resolution_clock::now();
-        fileHandler.mergeFile();
+        fileHandler.mergeFile(fileHandler.custom_buffer_size);
         // end = chrono::high_resolution_clock::now();
         // int64_t merge_duration = chrono::duration_cast<chrono::microseconds>(end - start).count();
         cout << "\nThe execution time ...";
